@@ -1,0 +1,139 @@
+services:
+  traefik:
+    image: traefik:v2.10
+    container_name: traefik
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "${TRAEFIK_WEB_PORT}:80"
+      - "${TRAEFIK_API_PORT}:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    networks:
+      - proxy
+
+  gitea:
+    image: gitea/gitea:latest
+    container_name: gitea
+    environment:
+      DISABLE_REGISTRATION: "true"
+      ROOT_URL: "https://${GITEA_DOMAIN}"
+    ports:
+      - "${GITEA_SSH_PORT}:22"
+    volumes:
+      - gitea:/data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.gitea.rule=Host(`${GITEA_DOMAIN}`)"
+      - "traefik.http.routers.gitea.entrypoints=web"
+      - "traefik.http.services.gitea.loadbalancer.server.port=3000"
+      - "traefik.docker.network=proxy"
+    networks:
+      - proxy
+
+  woodpecker-server:
+    image: woodpeckerci/woodpecker-server:next-2a445a6663-alpine
+    container_name: woodpecker-server
+    environment:
+      WOODPECKER_HOST: "https://${WOODPECKER_DOMAIN}"
+      WOODPECKER_OPEN: "true"
+      WOODPECKER_GITEA: "true"
+      WOODPECKER_GITEA_URL: "https://${GITEA_DOMAIN}"
+      WOODPECKER_GITEA_CLIENT: "6de1c095-dd30-497b-811e-278759f71eba"
+      WOODPECKER_GITEA_SECRET: ${GITEA_CLIENT_SECRET}
+      WOODPECKER_SERVER_ADDR: ":8000"
+      WOODPECKER_AGENT_SECRET: ${WOODPECKER_AGENT_SECRET}
+    volumes:
+      - woodpecker:/var/lib/woodpecker
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.woodpecker.rule=Host(`${WOODPECKER_DOMAIN}`)"
+      - "traefik.http.routers.woodpecker.entrypoints=web"
+      - "traefik.http.services.woodpecker.loadbalancer.server.port=8000"
+      - "traefik.docker.network=proxy"
+    networks:
+      - proxy
+
+  woodpecker-agent:
+    image: woodpeckerci/woodpecker-agent:next-2a445a6663-alpine
+    container_name: woodpecker-agent
+    environment:
+      WOODPECKER_SERVER: "woodpecker-server:9000"
+      WOODPECKER_AGENT_SECRET: ${WOODPECKER_AGENT_SECRET}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - softwares:/softwares
+    networks:
+      - proxy
+
+  mysql:
+    image: mysql:8
+    container_name: mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: softwares
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - proxy
+
+  webapp:
+    build:
+      context: .
+      dockerfile: Dockerfile.development
+    container_name: teletype-softwares
+    environment:
+      - DB_USER=root
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_NAME=softwares
+      - UPDATE_SECRET=${UPDATE_SECRET}
+      - GAMES_DIR=/softwares
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - softwares:/softwares
+      - ./:/app
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.webapp.rule=Host(`${WEBAPP_DOMAIN}`)"
+      - "traefik.http.routers.webapp.entrypoints=web"
+      - "traefik.http.services.webapp.loadbalancer.server.port=80"
+      - "traefik.docker.network=proxy"
+    networks:
+      - proxy
+  droparea:
+    image: linuxserver/openssh-server
+    container_name: droparea
+    environment:
+      PUID: 1
+      PGID: 1
+      TZ: Europe/Budapest
+      SUDO_ACCESS: "false"
+      PASSWORD_ACCESS: "true"
+      USER_NAME: drop
+      USER_PASSWORD: ${DROP_PASSWORD}
+    volumes:
+      - softwares:/home/drop
+    ports:
+      - "${DROPAREA_SSH_PORT}:2222"
+    networks:
+      - proxy
+
+volumes:
+  gitea:
+  woodpecker:
+  mysql-data:
+  softwares:
+
+networks:
+  proxy:

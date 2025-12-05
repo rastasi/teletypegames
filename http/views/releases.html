@@ -1,0 +1,31 @@
+{{define "content"}}
+<h1 class="my-4">Releases for {{.Software.Title}}</h1>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover table-bordered">
+        <thead class="bg-dark text-success">
+            <tr>
+                <th>Version</th>
+                <th>Released At</th>
+                <th>Downloads</th>
+            </tr>
+        </thead>
+        <tbody>
+        {{range .Software.Releases}}
+            <tr>
+                <td>{{.Version}}</td>
+                <td>{{.CreatedAt.Format "2006-01-02 15:04:05"}}</td>
+                <td>
+                    <div class="btn-group" role="group" aria-label="Download options">
+                        <a href="/download/{{$.Software.Name}}/{{.Version}}/source" class="btn btn-primary btn-sm">Source</a>
+                        <a href="/download/{{$.Software.Name}}/{{.Version}}/cartridge" class="btn btn-primary btn-sm">Cartridge</a>
+                    </div>
+                </td>
+            </tr>
+        {{end}}
+        </tbody>
+    </table>
+</div>
+
+<p><a href="/" class="btn btn-primary">Back to Softwares</a></p>
+{{end}}
