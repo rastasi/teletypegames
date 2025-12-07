@@ -105,7 +105,7 @@ services:
       - ./:/app
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.webapp.rule=Host(`${WEBAPP_DOMAIN}`)"
+      - "traefik.http.routers.webapp.rule=Host(`${WEBAPP_DOMAIN}`) || Host(`${WEBAPP_TECHNICAL_DOMAIN}`)"
       - "traefik.http.routers.webapp.entrypoints=web"
       - "traefik.http.services.webapp.loadbalancer.server.port=80"
       - "traefik.docker.network=proxy"
