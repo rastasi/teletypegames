@@ -29,7 +29,7 @@ func NewSoftwareUpdaterTIC80Service(
 
 func (s *SoftwareUpdaterTIC80Service) Update(name string) error {
 	fmt.Printf("TIC80 Updater: Starting update for name: %s\n", name)
-	contentsPath, _ := os.LookupEnv("CONTENTS_DIR")
+	contentsPath, _ := os.LookupEnv("GAMES_DIR")
 
 	// Case 1: HTML content (name.html.zip)
 	if err := s.handleHTMLContent(name, contentsPath); err == nil {

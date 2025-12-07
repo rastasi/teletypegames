@@ -40,7 +40,7 @@ func (c *PlayController) Play(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *PlayController) ServeContent(w http.ResponseWriter, r *http.Request) {
-	contentsPath := os.Getenv("CONTENTS_DIR")
+	contentsPath := os.Getenv("GAMES_DIR")
 	name := chi.URLParam(r, "name")
 	if name == "" {
 		http.Error(w, "Name not provided", http.StatusBadRequest)
