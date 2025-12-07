@@ -5,36 +5,39 @@ import (
 )
 
 type Domain struct {
-	SoftwareRepository     SoftwareRepository
-	ReleaseRepository      ReleaseRepository
-	DownloadService        DownloadService
-	SoftwareUpdaterService SoftwareUpdaterService
-	SoftwareService        SoftwareService
+	SoftwareRepository            SoftwareRepositoryInterface
+	ReleaseRepository             ReleaseRepositoryInterface
+	FileRepository                FileRepositoryInterface
+	DownloadService               DownloadServiceInterface
+	SoftwareUpdaterService        SoftwareUpdaterServiceInterface
+	SoftwareService               SoftwareServiceInterface
 }
 
 func NewDomain() Domain {
 	DB := mysql_utils.Init()
 	MigrateGoDatabase(DB)
 
-	softwareRepository := &softwareRepository{db: DB}
-	releaseRepository := &releaseRepository{db: DB}
-	softwareService := &softwareService{softwareRepository: softwareRepository}
-	tic80Updater := &softwareUpdaterTIC80Service{
-		softwareRepository: softwareRepository,
-		releaseRepository:  releaseRepository,
-	}
+	softwareRepository := &SoftwareRepository{db: DB}
+	releaseRepository := &ReleaseRepository{db: DB}
+	fileRepository := NewFileRepository()
 
-	softwareUpdaterService := &softwareUpdaterService{tic80Updater: tic80Updater}
+	softwareService := NewSoftwareService(softwareRepository)
+	
+	tic80Updater := NewSoftwareUpdaterTIC80Service(
+		softwareRepository,
+		releaseRepository,
+		fileRepository,
+	)
 
-	downloadServiceInstance := &downloadService{
-		softwareRepository: softwareRepository,
-		releaseRepository:  releaseRepository,
-	}
+	softwareUpdaterService := NewSoftwareUpdaterService(tic80Updater)
+
+	downloadService := NewDownloadService(softwareRepository, releaseRepository)
 
 	return Domain{
 		SoftwareRepository:     softwareRepository,
 		ReleaseRepository:      releaseRepository,
-		DownloadService:        downloadServiceInstance,
+		FileRepository:         fileRepository,
+		DownloadService:        downloadService,
 		SoftwareUpdaterService: softwareUpdaterService,
 		SoftwareService:        softwareService,
 	}

@@ -5,24 +5,38 @@ import (
 )
 
 type Router struct {
-	SoftwareController        *SoftwareController
-	SoftwareUpdaterController *SoftwareUpdaterController
-	DownloadController        *DownloadController
-	PlayController            *PlayController
+	softwareController        *SoftwareController
+	softwareUpdaterController *SoftwareUpdaterController
+	downloadController        *DownloadController
+	playController            *PlayController
 }
 
-func (r Router) Init() *chi.Mux {
+func NewRouter(
+	softwareController *SoftwareController,
+	softwareUpdaterController *SoftwareUpdaterController,
+	downloadController *DownloadController,
+	playController *PlayController,
+) *Router {
+	return &Router{
+		softwareController:        softwareController,
+		softwareUpdaterController: softwareUpdaterController,
+		downloadController:        downloadController,
+		playController:            playController,
+	}
+}
+
+func (r *Router) Init() *chi.Mux {
 	router := chi.NewRouter()
 
-	router.Get("/", r.SoftwareController.index)
-	router.Get("/update", r.SoftwareUpdaterController.update)
-	router.Get("/releases/{name}", r.SoftwareController.releases)
-	router.Get("/download/{name}/source", r.DownloadController.DownloadSource)
-	router.Get("/download/{name}/cartridge", r.DownloadController.DownloadCartridge)
-	router.Get("/download/{name}/{version}/source", r.DownloadController.DownloadSourceByVersion)
-	router.Get("/download/{name}/{version}/cartridge", r.DownloadController.DownloadCartridgeByVersion)
-	router.Get("/play/{name}", r.PlayController.PlayGame)
-	router.Get("/play/{name}/content*", r.PlayController.ServeGameContent)
+	router.Get("/", r.softwareController.index)
+	router.Get("/update", r.softwareUpdaterController.update)
+	router.Get("/releases/{name}", r.softwareController.releases)
+	router.Get("/download/{name}/source", r.downloadController.GetLatestSource)
+	router.Get("/download/{name}/cartridge", r.downloadController.GetLatestCartridge)
+	router.Get("/download/{name}/{version}/source", r.downloadController.GetSource)
+	router.Get("/download/{name}/{version}/cartridge", r.downloadController.GetCartridge)
+	router.Get("/play/{name}", r.playController.Play)
+	router.Get("/play/{name}/content*", r.playController.ServeContent)
 
 	return router
 }

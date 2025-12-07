@@ -12,10 +12,14 @@ import (
 )
 
 type DownloadController struct {
-	downloadService domain.DownloadService
+	service domain.DownloadServiceInterface
 }
 
-func (c *DownloadController) serveReleaseFile(w http.ResponseWriter, r *http.Request, release *domain.Release, isSource bool) {
+func NewDownloadController(service domain.DownloadServiceInterface) *DownloadController {
+	return &DownloadController{service: service}
+}
+
+func (c *DownloadController) serve(w http.ResponseWriter, r *http.Request, release *domain.Release, isSource bool) {
 	var filePath string
 	if isSource {
 		filePath = release.SourcePath
@@ -23,18 +27,19 @@ func (c *DownloadController) serveReleaseFile(w http.ResponseWriter, r *http.Req
 		filePath = release.CartridgePath
 	}
 
-	// Security check: ensure the file is within the softwares directory
 	absFilePath, err := filepath.Abs(filePath)
 	if err != nil {
 		http.Error(w, "Invalid file path", http.StatusInternalServerError)
 		return
 	}
-	absSoftwaresDir, err := filepath.Abs(os.Getenv("GAMES_DIR"))
+
+	absContentsDir, err := filepath.Abs(os.Getenv("CONTENTS_DIR"))
 	if err != nil {
-		http.Error(w, "Invalid softwares directory path", http.StatusInternalServerError)
+		http.Error(w, "Invalid contents directory path", http.StatusInternalServerError)
 		return
 	}
-	if !strings.HasPrefix(absFilePath, absSoftwaresDir) {
+
+	if !strings.HasPrefix(absFilePath, absContentsDir) {
 		http.Error(w, "Access denied", http.StatusForbidden)
 		return
 	}
@@ -43,64 +48,60 @@ func (c *DownloadController) serveReleaseFile(w http.ResponseWriter, r *http.Req
 	http.ServeFile(w, r, filePath)
 }
 
-func (c *DownloadController) DownloadSource(w http.ResponseWriter, r *http.Request) {
+func (c *DownloadController) handleError(w http.ResponseWriter, err error) {
+	if err == domain.ErrSoftwareNotFound || err == domain.ErrNoReleasesFound {
+		http.Error(w, "Software not found", http.StatusNotFound)
+		return
+	}
+	if err == domain.ErrReleaseNotFound {
+		http.Error(w, "Software or release not found", http.StatusNotFound)
+		return
+	}
+	http.Error(w, err.Error(), http.StatusInternalServerError)
+}
+
+func (c *DownloadController) GetLatestSource(w http.ResponseWriter, r *http.Request) {
 	name := chi.URLParam(r, "name")
-	release, err := c.downloadService.GetLatestRelease(name)
+	release, err := c.service.GetLatestRelease(name)
 	if err != nil {
-		if err == domain.ErrSoftwareNotFound || err == domain.ErrNoReleasesFound {
-			http.Error(w, "Software not found", http.StatusNotFound)
-			return
-		}
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		c.handleError(w, err)
 		return
 	}
 
-	c.serveReleaseFile(w, r, release, true)
+	c.serve(w, r, release, true)
 }
 
-func (c *DownloadController) DownloadCartridge(w http.ResponseWriter, r *http.Request) {
+func (c *DownloadController) GetLatestCartridge(w http.ResponseWriter, r *http.Request) {
 	name := chi.URLParam(r, "name")
-	release, err := c.downloadService.GetLatestRelease(name)
+	release, err := c.service.GetLatestRelease(name)
 	if err != nil {
-		if err == domain.ErrSoftwareNotFound || err == domain.ErrNoReleasesFound {
-			http.Error(w, "Software not found", http.StatusNotFound)
-			return
-		}
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		c.handleError(w, err)
 		return
 	}
 
-	c.serveReleaseFile(w, r, release, false)
+	c.serve(w, r, release, false)
 }
 
-func (c *DownloadController) DownloadSourceByVersion(w http.ResponseWriter, r *http.Request) {
+func (c *DownloadController) GetSource(w http.ResponseWriter, r *http.Request) {
 	name := chi.URLParam(r, "name")
 	version := chi.URLParam(r, "version")
-	release, err := c.downloadService.GetSpecificRelease(name, version)
+	release, err := c.service.GetSpecificRelease(name, version)
 	if err != nil {
-		if err == domain.ErrSoftwareNotFound || err == domain.ErrReleaseNotFound {
-			http.Error(w, "Software or release not found", http.StatusNotFound)
-			return
-		}
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		c.handleError(w, err)
 		return
 	}
 
-	c.serveReleaseFile(w, r, release, true)
+	c.serve(w, r, release, true)
 }
 
-func (c *DownloadController) DownloadCartridgeByVersion(w http.ResponseWriter, r *http.Request) {
+func (c *DownloadController) GetCartridge(w http.ResponseWriter, r *http.Request) {
 	name := chi.URLParam(r, "name")
 	version := chi.URLParam(r, "version")
-	release, err := c.downloadService.GetSpecificRelease(name, version)
+	release, err := c.service.GetSpecificRelease(name, version)
 	if err != nil {
-		if err == domain.ErrSoftwareNotFound || err == domain.ErrReleaseNotFound {
-			http.Error(w, "Software or release not found", http.StatusNotFound)
-			return
-		}
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		c.handleError(w, err)
 		return
 	}
 
-	c.serveReleaseFile(w, r, release, false)
+	c.serve(w, r, release, false)
 }

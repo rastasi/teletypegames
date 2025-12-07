@@ -4,7 +4,6 @@ import "gorm.io/gorm"
 
 type Software struct {
 	gorm.Model
-	ID       uint      `gorm:"primaryKey" json:"id"`
 	Name     string    `gorm:"uniqueIndex;size:128" json:"name"`
 	Title    string    `gorm:"size:255" json:"title"`
 	Author   string    `gorm:"size:255" json:"author"`

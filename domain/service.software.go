@@ -7,17 +7,21 @@ type SoftwareListDTO struct {
 	LatestRelease *Release
 }
 
-type SoftwareService interface {
+type SoftwareServiceInterface interface {
 	List() ([]SoftwareListDTO, error)
 	GetByNameWithReleases(name string) (*Software, error)
 }
 
-type softwareService struct {
-	softwareRepository SoftwareRepository
+type SoftwareService struct {
+	repository SoftwareRepositoryInterface
 }
 
-func (s *softwareService) List() ([]SoftwareListDTO, error) {
-	softwares, err := s.softwareRepository.List()
+func NewSoftwareService(repository SoftwareRepositoryInterface) *SoftwareService {
+	return &SoftwareService{repository: repository}
+}
+
+func (s *SoftwareService) List() ([]SoftwareListDTO, error) {
+	softwares, err := s.repository.List()
 	if err != nil {
 		return nil, err
 	}
@@ -26,7 +30,6 @@ func (s *softwareService) List() ([]SoftwareListDTO, error) {
 	for _, sw := range softwares {
 		dto := SoftwareListDTO{Software: sw}
 		if len(sw.Releases) > 0 {
-			// Sort releases by CreatedAt in descending order to find the latest
 			sort.Slice(sw.Releases, func(i, j int) bool {
 				return sw.Releases[i].CreatedAt.After(sw.Releases[j].CreatedAt)
 			})
@@ -38,6 +41,6 @@ func (s *softwareService) List() ([]SoftwareListDTO, error) {
 	return dtos, nil
 }
 
-func (s *softwareService) GetByNameWithReleases(name string) (*Software, error) {
-	return s.softwareRepository.GetByName(name)
+func (s *SoftwareService) GetByNameWithReleases(name string) (*Software, error) {
+	return s.repository.GetByName(name)
 }

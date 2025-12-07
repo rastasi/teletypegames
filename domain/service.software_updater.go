@@ -4,19 +4,21 @@ import (
 	"fmt"
 )
 
-// Keep os for getting GAME_PATH in TIC80 service if needed
-
-type SoftwareUpdaterService interface {
-	UpdateSoftware(platform, name string) error
+type SoftwareUpdaterServiceInterface interface {
+	Update(platform, name string) error
 }
 
-type softwareUpdaterService struct {
-	tic80Updater SoftwareUpdaterTIC80Service
+type SoftwareUpdaterService struct {
+	tic80Updater SoftwareUpdaterTIC80ServiceInterface
 }
 
-func (s *softwareUpdaterService) UpdateSoftware(platform, name string) error {
+func NewSoftwareUpdaterService(tic80Updater SoftwareUpdaterTIC80ServiceInterface) *SoftwareUpdaterService {
+	return &SoftwareUpdaterService{tic80Updater: tic80Updater}
+}
+
+func (s *SoftwareUpdaterService) Update(platform, name string) error {
 	if platform == "tic80" {
-		return s.tic80Updater.UpdateTIC80Software(name)
+		return s.tic80Updater.Update(name)
 	}
 	return fmt.Errorf("unsupported platform: %s", platform)
 }

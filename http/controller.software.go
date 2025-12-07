@@ -1,26 +1,30 @@
 package http
 
 import (
-	"html/template"
 	"net/http"
 
 	"teletype_softwares/domain"
+	"teletype_softwares/lib/template_utils"
 
 	"github.com/go-chi/chi/v5"
 )
 
 type SoftwareController struct {
-	softwareService domain.SoftwareService
+	service domain.SoftwareServiceInterface
+}
+
+func NewSoftwareController(service domain.SoftwareServiceInterface) *SoftwareController {
+	return &SoftwareController{service: service}
 }
 
 func (c *SoftwareController) index(w http.ResponseWriter, r *http.Request) {
-	softwares, err := c.softwareService.List()
+	softwares, err := c.service.List()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	tmpl, err := template.ParseFiles("http/views/layouts/main.html", "http/views/index.html")
+	tmpl, err := template_utils.GetTemplate("index", "http/views/layouts/main.html", "http/views/index.html")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -31,7 +35,7 @@ func (c *SoftwareController) index(w http.ResponseWriter, r *http.Request) {
 
 func (c *SoftwareController) releases(w http.ResponseWriter, r *http.Request) {
 	name := chi.URLParam(r, "name")
-	software, err := c.softwareService.GetByNameWithReleases(name)
+	software, err := c.service.GetByNameWithReleases(name)
 	if err != nil {
 		if err == domain.ErrSoftwareNotFound {
 			http.Error(w, "Software not found", http.StatusNotFound)
@@ -41,7 +45,7 @@ func (c *SoftwareController) releases(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl, err := template.ParseFiles("http/views/layouts/main.html", "http/views/releases.html")
+	tmpl, err := template_utils.GetTemplate("releases", "http/views/layouts/main.html", "http/views/releases.html")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

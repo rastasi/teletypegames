@@ -2,17 +2,17 @@ package domain
 
 import "gorm.io/gorm"
 
-type SoftwareRepository interface {
+type SoftwareRepositoryInterface interface {
 	List() ([]Software, error)
 	GetByName(name string) (*Software, error)
 	UpdateOrCreate(software *Software) error
 }
 
-type softwareRepository struct {
+type SoftwareRepository struct {
 	db *gorm.DB
 }
 
-func (r *softwareRepository) GetByName(name string) (*Software, error) {
+func (r *SoftwareRepository) GetByName(name string) (*Software, error) {
 	var software Software
 	if err := r.db.Preload("Releases").Where("name = ?", name).First(&software).Error; err != nil {
 		return nil, err
@@ -20,7 +20,7 @@ func (r *softwareRepository) GetByName(name string) (*Software, error) {
 	return &software, nil
 }
 
-func (r *softwareRepository) List() ([]Software, error) {
+func (r *SoftwareRepository) List() ([]Software, error) {
 	var softwares []Software
 	if err := r.db.Preload("Releases").Find(&softwares).Error; err != nil {
 		return nil, err
@@ -28,7 +28,7 @@ func (r *softwareRepository) List() ([]Software, error) {
 	return softwares, nil
 }
 
-func (r *softwareRepository) UpdateOrCreate(software *Software) error {
+func (r *SoftwareRepository) UpdateOrCreate(software *Software) error {
 	var existing Software
 	if err := r.db.Where("name = ?", software.Name).First(&existing).Error; err == nil {
 		software.ID = existing.ID

@@ -8,7 +8,11 @@ import (
 )
 
 type SoftwareUpdaterController struct {
-	softwareUpdaterService domain.SoftwareUpdaterService
+	service domain.SoftwareUpdaterServiceInterface
+}
+
+func NewSoftwareUpdaterController(service domain.SoftwareUpdaterServiceInterface) *SoftwareUpdaterController {
+	return &SoftwareUpdaterController{service: service}
 }
 
 func (c *SoftwareUpdaterController) update(w http.ResponseWriter, r *http.Request) {
@@ -21,7 +25,7 @@ func (c *SoftwareUpdaterController) update(w http.ResponseWriter, r *http.Reques
 	platform := r.URL.Query().Get("platform")
 	name := r.URL.Query().Get("name")
 
-	if err := c.softwareUpdaterService.UpdateSoftware(platform, name); err != nil {
+	if err := c.service.Update(platform, name); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
