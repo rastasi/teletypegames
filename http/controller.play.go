@@ -24,7 +24,7 @@ func (c *PlayController) Play(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl, err := template_utils.GetTemplate("play", "http/views/layouts/main.html", "http/views/play.html")
+	tmpl, err := template_utils.GetTemplate("play_controller_play", "http/views/shared/layout.html", "http/views/play/play.html")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

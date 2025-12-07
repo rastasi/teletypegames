@@ -24,7 +24,7 @@ func (c *SoftwareController) index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl, err := template_utils.GetTemplate("index", "http/views/layouts/main.html", "http/views/index.html")
+	tmpl, err := template_utils.GetTemplate("software_index", "http/views/shared/layout.html", "http/views/software/index.html")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -45,7 +45,7 @@ func (c *SoftwareController) releases(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl, err := template_utils.GetTemplate("releases", "http/views/layouts/main.html", "http/views/releases.html")
+	tmpl, err := template_utils.GetTemplate("software_releases", "http/views/shared/layout.html", "http/views/software/releases.html")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

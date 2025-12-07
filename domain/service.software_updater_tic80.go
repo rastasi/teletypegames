@@ -31,13 +31,11 @@ func (s *SoftwareUpdaterTIC80Service) Update(name string) error {
 	fmt.Printf("TIC80 Updater: Starting update for name: %s\n", name)
 	contentsPath, _ := os.LookupEnv("GAMES_DIR")
 
-	// Case 1: HTML content (name.html.zip)
 	if err := s.handleHTMLContent(name, contentsPath); err == nil {
 		fmt.Printf("TIC80 Updater: Successfully processed HTML content: %s\n", name)
 		return nil
 	}
 
-	// Case 2: TIC-80 Lua cartridge (name.lua and name.tic)
 	if err := s.handleLuaCartridge(name, contentsPath); err != nil {
 		return err
 	}

@@ -39,8 +39,6 @@ func NewDBMockSuite() *DBMockSuite {
 		panic("GORM open error")
 	}
 
-	// gormdb.AutoMigrate()
-
 	return &DBMockSuite{
 		DB:   gormdb,
 		Mock: mock,
