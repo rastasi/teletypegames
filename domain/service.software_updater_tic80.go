@@ -33,7 +33,6 @@ func (s *SoftwareUpdaterTIC80Service) Update(name string) error {
 
 	if err := s.handleHTMLContent(name, contentsPath); err == nil {
 		fmt.Printf("TIC80 Updater: Successfully processed HTML content: %s\n", name)
-		return nil
 	}
 
 	if err := s.handleLuaCartridge(name, contentsPath); err != nil {
