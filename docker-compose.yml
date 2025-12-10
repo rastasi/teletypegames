@@ -28,6 +28,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.gitea.rule=Host(`${GITEA_DOMAIN}`)"
+      - "traefik.http.routers.gitea.rule=Host(`${GITEA_DOMAIN}`) || Host(`${GITEA_TECHNICAL_DOMAIN}`)"
       - "traefik.http.routers.gitea.entrypoints=web"
       - "traefik.http.services.gitea.loadbalancer.server.port=3000"
       - "traefik.docker.network=proxy"
@@ -50,7 +51,7 @@ services:
       - woodpecker:/var/lib/woodpecker
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.woodpecker.rule=Host(`${WOODPECKER_DOMAIN}`)"
+      - "traefik.http.routers.woodpecker.rule=Host(`${WOODPECKER_DOMAIN}`) || Host(`${WOODPECKER_TECHNICAL_DOMAIN}`)"
       - "traefik.http.routers.woodpecker.entrypoints=web"
       - "traefik.http.services.woodpecker.loadbalancer.server.port=8000"
       - "traefik.docker.network=proxy"

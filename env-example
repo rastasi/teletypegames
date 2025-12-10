@@ -1,8 +1,12 @@
 # Domains
-GITEA_DOMAIN=gitea.vps.teletype.hu
-WOODPECKER_DOMAIN=woodpecker.vps.teletype.hu
-WEBAPP_DOMAIN=softwares.teletype.hu
-WEBAPP_TECHNICAL_DOMAIN=softwares.vps.teletype.hu
+GITEA_DOMAIN=git.teletype.hu
+GITEA_TECHNICAL_DOMAIN=gitea.vps.teletype.hu
+
+WOODPECKER_DOMAIN=ci.teletype.hu
+WOODPECKER_TECHNICAL_DOMAIN=woodpecker.vps.teletype.hu
+
+WEBAPP_DOMAIN=games.teletype.hu
+WEBAPP_TECHNICAL_DOMAIN=games.vps.teletype.hu
 
 # Ports
 GITEA_SSH_PORT=2222
