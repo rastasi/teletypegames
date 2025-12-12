@@ -10,7 +10,7 @@ func StartHttpServer(domainInstance domain.Domain) {
 		NewSoftwareController(domainInstance.SoftwareService),
 		NewSoftwareUpdaterController(domainInstance.SoftwareUpdaterService),
 		NewDownloadController(domainInstance.DownloadService),
-		NewPlayController(),
+		NewPlayController(domainInstance.SoftwareService),
 	).Init()
 
 	http_utils.StartGenericHTTPServer(http_utils.StartGenericHTTPServerContext{

@@ -1,10 +1,59 @@
 {{define "content"}}
-<h1 class="my-4">Play {{.Name}}</h1>
+<h1 class="my-4">Play {{.Software.Title}}</h1>
 
 <div class="ratio ratio-4x3" style="max-width: 640px; margin: 0 auto;">
-    <iframe id="gameFrame" src="/play/{{.Name}}/content/index.html" frameborder="0" allowfullscreen></iframe>
+    <iframe id="gameFrame" src="/play/{{.Software.Name}}/content/index.html" frameborder="0" allowfullscreen></iframe>
 </div>
 
-<p style="margin-top: 20px"><a href="/" class="btn btn-primary">Back to Softwares</a></p>
+<div style="max-width: 640px; margin: 10px auto; text-align: center;">
+    <div class="btn-group" role="group" aria-label="Game controls">
+        <a href="/" class="btn btn-primary">Back to Softwares</a>
+        <button id="fullscreenButton" class="btn btn-secondary">Fullscreen</button>
+    </div>
+</div>
+
+<script>
+    document.getElementById('fullscreenButton').addEventListener('click', function() {
+        var iframe = document.getElementById('gameFrame');
+        if (iframe.requestFullscreen) {
+            iframe.requestFullscreen();
+        } else if (iframe.mozRequestFullScreen) { /* Firefox */
+            iframe.mozRequestFullScreen();
+        } else if (iframe.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
+            iframe.webkitRequestFullscreen();
+        } else if (iframe.msRequestFullscreen) { /* IE/Edge */
+            iframe.msRequestFullscreen();
+        }
+    });
+
+    document.addEventListener('fullscreenchange', function() {
+        if (document.fullscreenElement) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+    });
+    document.addEventListener('mozfullscreenchange', function() {
+        if (document.mozFullScreenElement) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+    });
+    document.addEventListener('webkitfullscreenchange', function() {
+        if (document.webkitFullscreenElement) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+    });
+    document.addEventListener('msfullscreenchange', function() {
+        if (document.msFullscreenElement) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+    });
+</script>
 
 {{end}}

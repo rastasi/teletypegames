@@ -5,16 +5,20 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-
+	"teletype_softwares/domain"
 	"teletype_softwares/lib/template_utils"
 
 	"github.com/go-chi/chi/v5"
 )
 
-type PlayController struct{}
+type PlayController struct {
+	softwareService domain.SoftwareServiceInterface
+}
 
-func NewPlayController() *PlayController {
-	return &PlayController{}
+func NewPlayController(softwareService domain.SoftwareServiceInterface) *PlayController {
+	return &PlayController{
+		softwareService: softwareService,
+	}
 }
 
 func (c *PlayController) Play(w http.ResponseWriter, r *http.Request) {
@@ -24,19 +28,25 @@ func (c *PlayController) Play(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	software, err := c.softwareService.GetByNameWithReleases(name)
+	if err != nil {
+		if err == domain.ErrSoftwareNotFound {
+			http.Error(w, "Software not found", http.StatusNotFound)
+			return
+		}
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	tmpl, err := template_utils.GetTemplate("play_controller_play", "http/views/shared/layout.html", "http/views/play/play.html")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	data := struct {
-		Name string
-	}{
-		Name: name,
-	}
-
-	tmpl.Execute(w, data)
+	tmpl.Execute(w, map[string]interface{}{
+		"Software": software,
+	})
 }
 
 func (c *PlayController) ServeContent(w http.ResponseWriter, r *http.Request) {
