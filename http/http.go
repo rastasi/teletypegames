@@ -11,6 +11,7 @@ func StartHttpServer(domainInstance domain.Domain) {
 		NewSoftwareUpdaterController(domainInstance.SoftwareUpdaterService),
 		NewDownloadController(domainInstance.DownloadService),
 		NewPlayController(domainInstance.SoftwareService),
+		NewRootController(),
 	).Init()
 
 	http_utils.StartGenericHTTPServer(http_utils.StartGenericHTTPServerContext{

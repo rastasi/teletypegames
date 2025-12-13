@@ -2,6 +2,7 @@ package http
 
 import (
 	"github.com/go-chi/chi/v5"
+	"net/http"
 )
 
 type Router struct {
@@ -9,6 +10,7 @@ type Router struct {
 	softwareUpdaterController *SoftwareUpdaterController
 	downloadController        *DownloadController
 	playController            *PlayController
+	rootController            *RootController
 }
 
 func NewRouter(
@@ -16,19 +18,22 @@ func NewRouter(
 	softwareUpdaterController *SoftwareUpdaterController,
 	downloadController *DownloadController,
 	playController *PlayController,
+	rootController *RootController,
 ) *Router {
 	return &Router{
 		softwareController:        softwareController,
 		softwareUpdaterController: softwareUpdaterController,
 		downloadController:        downloadController,
 		playController:            playController,
+		rootController:            rootController,
 	}
 }
 
 func (r *Router) Init() *chi.Mux {
 	router := chi.NewRouter()
 
-	router.Get("/", r.softwareController.index)
+	router.Get("/", r.rootController.index)
+	router.Get("/softwares", r.softwareController.index)
 	router.Get("/update", r.softwareUpdaterController.update)
 	router.Get("/releases/{name}", r.softwareController.releases)
 	router.Get("/download/{name}/source", r.downloadController.GetLatestSource)
@@ -37,6 +42,9 @@ func (r *Router) Init() *chi.Mux {
 	router.Get("/download/{name}/{version}/cartridge", r.downloadController.GetCartridge)
 	router.Get("/play/{name}", r.playController.Play)
 	router.Get("/play/{name}/content*", r.playController.ServeContent)
+
+	fs := http.FileServer(http.Dir("assets"))
+	router.Handle("/assets/*", http.StripPrefix("/assets/", fs))
 
 	return router
 }
