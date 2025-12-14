@@ -12,7 +12,7 @@ dev:
 	$(call docker_compose,up $(DEV_SERVICES))
 
 start:
-	$(call docker_compose,up -d --force-recreate $(DEV_SERVICES))
+	$(call docker_compose,up -d --force-recreate)
 
 stop:
 	$(call docker_compose,down --remove-orphans)
