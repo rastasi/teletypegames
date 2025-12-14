@@ -4,8 +4,13 @@ const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-const letters = 'ABCDEFGHIJKLMNOPQRSTUVXYZABCDEFGHIJKLMNOPQRSTUVXYZABCDEFGHIJKLMNOPQRSTUVXYZABCDEFGHIJKLMNOPQRSTUVXYZABCDEFGHIJKLMNOPQRSTUVXYZABCDEFGHIJKLMNOPQRSTUVXYZ1234567890';
-const fontSize = 16;
+//const letters = 'ABCDEFGHIJKLMNOPQRSTUVXYZABCDEFGHIJKLMNOPQRSTUVXYZABCDEFGHIJKLMNOPQRSTUVXYZABCDEFGHIJKLMNOPQRSTUVXYZABCDEFGHIJKLMNOPQRSTUVXYZABCDEFGHIJKLMNOPQRSTUVXYZ1234567890';
+const letters = '日ﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍｦｲｸｺｿﾁﾄﾉﾌﾔﾖﾙﾚﾛﾝ012345789ZTHEMATRIX:・."=*+-<>¦｜╌çｸ̄'
+const fontSize = 24;
+const fontColor = '#0F0';
+const backgroundColor = 'rgba(0, 0, 0, 0.05)';
+const milisec = 80;
+
 let columns = canvas.width / fontSize;
 
 const drops = [];
@@ -14,10 +19,10 @@ for (let x = 0; x < columns; x++) {
 }
 
 function draw() {
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+    ctx.fillStyle = backgroundColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    ctx.fillStyle = '#0F0'; // green text
+    ctx.fillStyle = fontColor;
     ctx.font = fontSize + 'px arial';
 
     for (let i = 0; i < drops.length; i++) {
@@ -31,7 +36,7 @@ function draw() {
     }
 }
 
-setInterval(draw, 33);
+setInterval(draw, milisec);
 
 window.addEventListener('resize', () => {
     canvas.width = window.innerWidth;
