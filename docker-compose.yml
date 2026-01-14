@@ -24,7 +24,7 @@ services:
     ports:
       - "${GITEA_SSH_PORT}:22"
     volumes:
-      - gitea:/data
+      - ./data/gitea:/data
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.gitea.rule=Host(`${GITEA_DOMAIN}`)"
@@ -48,7 +48,7 @@ services:
       WOODPECKER_SERVER_ADDR: ":8000"
       WOODPECKER_AGENT_SECRET: ${WOODPECKER_AGENT_SECRET}
     volumes:
-      - woodpecker:/var/lib/woodpecker
+      - ./data/woodpecker:/var/lib/woodpecker
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.woodpecker.rule=Host(`${WOODPECKER_DOMAIN}`) || Host(`${WOODPECKER_TECHNICAL_DOMAIN}`)"
@@ -81,7 +81,7 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: softwares
     volumes:
-      - mysql-data:/var/lib/mysql
+      - ./data/mysql:/var/lib/mysql
     networks:
       - proxy
 
@@ -102,7 +102,7 @@ services:
       mysql:
         condition: service_healthy
     volumes:
-      - softwares:/softwares
+      - ./data/softwares:/softwares
       - ./:/app
     labels:
       - "traefik.enable=true"
@@ -124,7 +124,7 @@ services:
       USER_NAME: drop
       USER_PASSWORD: ${DROP_PASSWORD}
     volumes:
-      - softwares:/home/drop
+      - ./data/softwares:/home/drop
     ports:
       - "${DROPAREA_SSH_PORT}:2222"
     networks:
