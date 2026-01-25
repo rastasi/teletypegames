@@ -40,8 +40,10 @@ func (r *Router) Init() *chi.Mux {
 	router.Get("/download/{name}/cartridge", r.downloadController.GetLatestCartridge)
 	router.Get("/download/{name}/{version}/source", r.downloadController.GetSource)
 	router.Get("/download/{name}/{version}/cartridge", r.downloadController.GetCartridge)
-	router.Get("/play/{name}", r.playController.Play)
-	router.Get("/play/{name}/content*", r.playController.ServeContent)
+	router.Get("/play/{name}", r.playController.PlayV1)
+	router.Get("/play/{name}/content*", r.playController.ServeContentV1)
+	router.Get("/play/{name}/{version}", r.playController.Play)
+	router.Get("/play/{name}/{version}/content*", r.playController.ServeContent)
 
 	fs := http.FileServer(http.Dir("assets"))
 	router.Handle("/assets/*", http.StripPrefix("/assets/", fs))

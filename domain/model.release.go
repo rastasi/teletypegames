@@ -8,4 +8,5 @@ type Release struct {
 	Version       string `gorm:"size:64" json:"version"`
 	CartridgePath string `gorm:"size:255" json:"-"`
 	SourcePath    string `gorm:"size:255" json:"-"`
+	WebPlayable   bool   `gorm:"default:false" json:"web_playable"`
 }

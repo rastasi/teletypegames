@@ -1,14 +1,29 @@
 {{define "content"}}
 <h1 class="my-4">Play {{.Software.Title}}</h1>
 
-<div class="ratio ratio-4x3" style="max-width: 640px; margin: 0 auto;">
-    <iframe id="gameFrame" src="/play/{{.Software.Name}}/content/index.html" frameborder="0" allowfullscreen></iframe>
+<div class="ratio ratio-4x3" style="max-width: 960px; margin: 0 auto;">
+    <iframe id="gameFrame" src="/play/{{.Software.Name}}/{{.WebPlayableRelease.Version}}/content/index.html" frameborder="0" allowfullscreen></iframe>
 </div>
 
-<div style="max-width: 640px; margin: 10px auto; text-align: center;">
+<div style="max-width: 960px; margin: 10px auto; text-align: center;">
     <div class="btn-group" role="group" aria-label="Game controls">
-        <a href="/" class="btn btn-primary">Back to Softwares</a>
+        <a href="/releases/{{.Software.Name}}" class="btn btn-primary">Back to Releases</a>
         <button id="fullscreenButton" class="btn btn-secondary">Fullscreen</button>
+    </div>
+</div>
+
+<div style="max-width: 960px; margin: 10px auto; text-align: start;">
+    <h2 class="my-4">Version</h2>
+    <p>{{.WebPlayableRelease.Version}}</p>
+    <h2 class="my-4">Other Versions</h2>
+    <div class="list-group">
+        {{range .Software.Releases}}
+            {{if and .WebPlayable (ne .Version $.WebPlayableRelease.Version)}}
+                <a href="/play/{{$.Software.Name}}/{{.Version}}" class="list-group-item list-group-item-action">
+                    {{.Version}}
+                </a>
+            {{end}}
+        {{end}}
     </div>
 </div>
 
