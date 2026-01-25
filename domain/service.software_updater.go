@@ -5,7 +5,7 @@ import (
 )
 
 type SoftwareUpdaterServiceInterface interface {
-	Update(platform, name string) error
+	Update(platform, name, version string) error
 }
 
 type SoftwareUpdaterService struct {
@@ -16,9 +16,9 @@ func NewSoftwareUpdaterService(tic80Updater SoftwareUpdaterTIC80ServiceInterface
 	return &SoftwareUpdaterService{tic80Updater: tic80Updater}
 }
 
-func (s *SoftwareUpdaterService) Update(platform, name string) error {
+func (s *SoftwareUpdaterService) Update(platform, name, version string) error {
 	if platform == "tic80" {
-		return s.tic80Updater.Update(name)
+		return s.tic80Updater.Update(name, version)
 	}
 	return fmt.Errorf("unsupported platform: %s", platform)
 }

@@ -24,8 +24,14 @@ func (c *SoftwareUpdaterController) update(w http.ResponseWriter, r *http.Reques
 
 	platform := r.URL.Query().Get("platform")
 	name := r.URL.Query().Get("name")
+	version := r.URL.Query().Get("version")
 
-	if err := c.service.Update(platform, name); err != nil {
+	if version == "" {
+		http.Error(w, "Version not provided", http.StatusBadRequest)
+		return
+	}
+
+	if err := c.service.Update(platform, name, version); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

@@ -157,7 +157,7 @@ func (c *PlayController) ServeContent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	htmlBaseDir := filepath.Join(contentsPath, name, fmt.Sprintf("%s-%s-html", name, version))
+	htmlBaseDir := filepath.Join(contentsPath, name, version, "html")
 
 	if _, err := os.Stat(htmlBaseDir); os.IsNotExist(err) {
 		http.Error(w, fmt.Sprintf("Content for '%s' not found.", name), http.StatusNotFound)

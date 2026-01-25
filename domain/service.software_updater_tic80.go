@@ -6,7 +6,7 @@ import (
 )
 
 type SoftwareUpdaterTIC80ServiceInterface interface {
-	Update(name string) error
+	Update(name, version string) error
 }
 
 type SoftwareUpdaterTIC80Service struct {
@@ -27,15 +27,15 @@ func NewSoftwareUpdaterTIC80Service(
 	}
 }
 
-func (s *SoftwareUpdaterTIC80Service) Update(name string) error {
-	fmt.Printf("TIC80 Updater: Starting update for name: %s\n", name)
+func (s *SoftwareUpdaterTIC80Service) Update(name, version string) error {
+	fmt.Printf("TIC80 Updater: Starting update for name: %s, version: %s\n", name, version)
 	contentsPath, _ := os.LookupEnv("GAMES_DIR")
 
-	if err := s.handleHTMLContent(name, contentsPath); err == nil {
+	if err := s.handleHTMLContent(name, version, contentsPath); err == nil {
 		fmt.Printf("TIC80 Updater: Successfully processed HTML content: %s\n", name)
 	}
 
-	if err := s.handleLuaCartridge(name, contentsPath); err != nil {
+	if err := s.handleLuaCartridge(name, version, contentsPath); err != nil {
 		return err
 	}
 
@@ -43,36 +43,44 @@ func (s *SoftwareUpdaterTIC80Service) Update(name string) error {
 	return nil
 }
 
-func (s *SoftwareUpdaterTIC80Service) handleHTMLContent(name, contentsPath string) error {
+func (s *SoftwareUpdaterTIC80Service) handleHTMLContent(name, version, contentsPath string) error {
 	zipFileName := fmt.Sprintf("%s.html.zip", name)
-	baseName := name
+	// The zip file is now in the versioned folder
+	zipFilePathInVersionDir := s.fileRepository.GetFileInSoftwareVersionDir(name, version, zipFileName, contentsPath)
 
-	if err := s.fileRepository.UnzipHTMLContent(zipFileName, baseName, contentsPath); err != nil {
+	if err := s.fileRepository.UnzipHTMLContent(zipFilePathInVersionDir, name, version, contentsPath); err != nil {
 		return err
 	}
 
-	return s.fileRepository.DeleteFile(zipFileName, contentsPath)
+	return s.fileRepository.DeleteFile(zipFilePathInVersionDir, contentsPath)
 }
 
-func (s *SoftwareUpdaterTIC80Service) handleLuaCartridge(name, contentsPath string) error {
-	luaFileName := fmt.Sprintf("%s.lua", name)
-	cartridgeFileName := fmt.Sprintf("%s.tic", name)
+func (s *SoftwareUpdaterTIC80Service) handleLuaCartridge(name, version, contentsPath string) error {
+	// The lua and tic files are now in the versioned folder.
+	luaFileName := s.fileRepository.GetFileInSoftwareVersionDir(name, version, fmt.Sprintf("%s.lua", name), contentsPath)
+	cartridgeFileName := s.fileRepository.GetFileInSoftwareVersionDir(name, version, fmt.Sprintf("%s.tic", name), contentsPath)
 
-	if !s.fileRepository.FileExists(luaFileName, contentsPath) {
+
+	if !s.fileRepository.FileExists(luaFileName, "") { // basePath is already included in luaFileName
 		return fmt.Errorf("no recognizable content file found for '%s' in '%s'", name, contentsPath)
 	}
 
-	if !s.fileRepository.FileExists(cartridgeFileName, contentsPath) {
+	if !s.fileRepository.FileExists(cartridgeFileName, "") { // basePath is already included in cartridgeFileName
 		return fmt.Errorf("missing cartridge file '%s' for '%s'", cartridgeFileName, luaFileName)
 	}
 
-	software, version, err := s.parseMeta(luaFileName, name, contentsPath)
+	software, parsedVersion, err := s.parseMeta(luaFileName, name, contentsPath)
 	if err != nil {
 		return err
 	}
 
+	// Use the version from the webhook for consistency
+	if version != parsedVersion {
+		fmt.Printf("TIC80 Updater: Warning - parsed version '%s' from Lua file differs from provided version '%s'\n", parsedVersion, version)
+	}
+	
 	if version == "" {
-		return fmt.Errorf("missing version info in '%s'", luaFileName)
+		return fmt.Errorf("missing version info (webhook or parsed) for '%s'", luaFileName)
 	}
 
 	if err := s.softwareRepository.UpdateOrCreate(&software); err != nil {
@@ -94,24 +102,24 @@ func (s *SoftwareUpdaterTIC80Service) handleLuaCartridge(name, contentsPath stri
 	return s.releaseRepository.Create(release)
 }
 
-func (s *SoftwareUpdaterTIC80Service) moveCartridgeFiles(name string, software Software, version, luaFileName, cartridgeFileName, contentsPath string) error {
-	softwareDir := s.fileRepository.GetSoftwareDir(software.Name, contentsPath)
+func (s *SoftwareUpdaterTIC80Service) moveCartridgeFiles(name string, software Software, version, luaSrcPath, cartridgeSrcPath, contentsPath string) error {
+	softwareVersionDir := s.fileRepository.GetSoftwareVersionDir(software.Name, version, contentsPath)
 
-	fmt.Printf("TIC80 Updater: Creating software directory: %s\n", softwareDir)
-	if err := s.fileRepository.CreateDir(softwareDir); err != nil {
+	fmt.Printf("TIC80 Updater: Creating software version directory: %s\n", softwareVersionDir)
+	if err := s.fileRepository.CreateDir(softwareVersionDir); err != nil {
 		return err
 	}
 
 	newCartridgePath := s.fileRepository.GetCartridgePath(software.Name, version, contentsPath)
 	newSourcePath := s.fileRepository.GetSourcePath(software.Name, version, contentsPath)
 
-	fmt.Printf("TIC80 Updater: Moving cartridge from %s to %s\n", cartridgeFileName, newCartridgePath)
-	if err := s.fileRepository.MoveFile(cartridgeFileName, newCartridgePath, contentsPath); err != nil {
+	fmt.Printf("TIC80 Updater: Moving cartridge from %s to %s\n", cartridgeSrcPath, newCartridgePath)
+	if err := s.fileRepository.MoveFile(cartridgeSrcPath, newCartridgePath, ""); err != nil { // srcPath includes basePath
 		return err
 	}
 
-	fmt.Printf("TIC80 Updater: Moving Lua source from %s to %s\n", luaFileName, newSourcePath)
-	if err := s.fileRepository.MoveFile(luaFileName, newSourcePath, contentsPath); err != nil {
+	fmt.Printf("TIC80 Updater: Moving Lua source from %s to %s\n", luaSrcPath, newSourcePath)
+	if err := s.fileRepository.MoveFile(luaSrcPath, newSourcePath, ""); err != nil { // srcPath includes basePath
 		return err
 	}
 
@@ -122,7 +130,7 @@ func (s *SoftwareUpdaterTIC80Service) parseMeta(luaFileName, name, contentsPath 
 	var software Software
 	var version string
 
-	metaData, err := s.fileRepository.ReadMetaFromFile(luaFileName, contentsPath)
+	metaData, err := s.fileRepository.ReadMetaFromFile(luaFileName, "") // luaFileName already contains basePath
 	if err != nil {
 		return software, "", err
 	}
