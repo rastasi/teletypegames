@@ -88,6 +88,7 @@ func (s *SoftwareUpdaterTIC80Service) handleLuaCartridge(name, contentsPath stri
 		Version:       version,
 		CartridgePath: s.fileRepository.GetCartridgePath(software.Name, version, contentsPath),
 		SourcePath:    s.fileRepository.GetSourcePath(software.Name, version, contentsPath),
+		WebPlayable:   true,
 	}
 
 	return s.releaseRepository.Create(release)
