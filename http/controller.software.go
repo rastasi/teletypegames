@@ -35,7 +35,7 @@ func (c *SoftwareController) index(w http.ResponseWriter, r *http.Request) {
 
 type SoftwareShowData struct {
 	Software      *domain.Software
-	LatestVersion string
+	LatestRelease *domain.Release
 }
 
 func (c *SoftwareController) show(w http.ResponseWriter, r *http.Request) {
@@ -61,9 +61,13 @@ func (c *SoftwareController) show(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl, _ := template_utils.GetTemplate("software_show", "http/views/shared/layout.html", "http/views/software/show.html")
+	tmpl, err := template_utils.GetTemplate("software_show", "http/views/shared/layout.html", "http/views/software/show.html")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 	tmpl.Execute(w, SoftwareShowData{
 		Software:      software,
-		LatestVersion: latest_release.Version,
+		LatestRelease: latest_release,
 	})
 }
