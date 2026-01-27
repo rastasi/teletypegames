@@ -8,9 +8,9 @@ type FileService struct {
 	FileRepository FileRepositoryInterface
 }
 
-func NewFileService() *FileService {
+func NewFileService(file_repository FileRepositoryInterface) *FileService {
 	return &FileService{
-		FileRepository: NewFileRepository(),
+		FileRepository: file_repository,
 	}
 }
 

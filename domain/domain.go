@@ -34,6 +34,8 @@ func NewDomain() Domain {
 
 	downloadService := NewDownloadService(softwareRepository, releaseRepository)
 
+	fileService := NewFileService(fileRepository)
+
 	return Domain{
 		SoftwareRepository:     softwareRepository,
 		ReleaseRepository:      releaseRepository,
@@ -41,5 +43,6 @@ func NewDomain() Domain {
 		DownloadService:        downloadService,
 		SoftwareUpdaterService: softwareUpdaterService,
 		SoftwareService:        softwareService,
+		FileService:            fileService,
 	}
 }
