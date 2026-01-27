@@ -33,7 +33,7 @@ func (c *DownloadController) serve(w http.ResponseWriter, r *http.Request, relea
 		return
 	}
 
-	absContentsDir, err := filepath.Abs(os.Getenv("GAMES_DIR"))
+	absContentsDir, err := filepath.Abs(os.Getenv("FILE_CONTAINER_PATH"))
 	if err != nil {
 		http.Error(w, "Invalid contents directory path", http.StatusInternalServerError)
 		return

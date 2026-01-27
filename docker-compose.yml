@@ -97,7 +97,7 @@ services:
       - DB_PORT=3306
       - DB_NAME=softwares
       - UPDATE_SECRET=${UPDATE_SECRET}
-      - GAMES_DIR=/softwares
+      - FILE_CONTAINER_PATH=/softwares
     depends_on:
       mysql:
         condition: service_healthy

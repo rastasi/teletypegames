@@ -4,9 +4,9 @@ import "gorm.io/gorm"
 
 type Release struct {
 	gorm.Model
-	SoftwareID    uint   `gorm:"index" json:"software_id"`
-	Version       string `gorm:"size:64" json:"version"`
-	CartridgePath string `gorm:"size:255" json:"-"`
-	SourcePath    string `gorm:"size:255" json:"-"`
-	WebPlayable   bool   `gorm:"default:false" json:"web_playable"`
+	SoftwareID     uint   `gorm:"index" json:"software_id"`
+	Version        string `gorm:"size:64" json:"version"`
+	CartridgePath  string `gorm:"size:255" json:"-"`
+	SourcePath     string `gorm:"size:255" json:"-"`
+	HTMLFolderPath string `gorm:"size:255" json:"-"`
 }

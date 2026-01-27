@@ -1,8 +1,9 @@
 package http
 
 import (
-	"github.com/go-chi/chi/v5"
 	"net/http"
+
+	"github.com/go-chi/chi/v5"
 )
 
 type Router struct {
@@ -40,8 +41,6 @@ func (r *Router) Init() *chi.Mux {
 	router.Get("/download/{name}/cartridge", r.downloadController.GetLatestCartridge)
 	router.Get("/download/{name}/{version}/source", r.downloadController.GetSource)
 	router.Get("/download/{name}/{version}/cartridge", r.downloadController.GetCartridge)
-	router.Get("/play/{name}", r.playController.PlayV1)
-	router.Get("/play/{name}/content*", r.playController.ServeContentV1)
 	router.Get("/play/{name}/{version}", r.playController.Play)
 	router.Get("/play/{name}/{version}/content*", r.playController.ServeContent)
 

@@ -75,7 +75,7 @@
   - `parseMeta()` - Metadatok feldolgozása (de `FileRepository.ReadMetaFromFile()` segítségével)
 
 #### ✅ 3.2 Environment Variables - Centralizált konfiguráció
-- `GAMES_DIR` és `GAMES_DIR` továbbra is `os.Getenv()`-el hívódnak
+- `FILE_CONTAINER_PATH` és `FILE_CONTAINER_PATH` továbbra is `os.Getenv()`-el hívódnak
 - MEGLÉPÉS: Az env vars a Domain inicializációban továbbra is szétszórva vannak
 - TODO: Config struct még nem készült (de nem kritikus)
 
@@ -100,7 +100,7 @@
   ```
 
 #### ✅ 3.6 Erőforrás nevek megtisztítása
-- `GAMES_DIR` → `GAMES_DIR` (nem "game" szó)
+- `FILE_CONTAINER_PATH` → `FILE_CONTAINER_PATH` (nem "game" szó)
 - Összes referencia frissítve
 
 ---

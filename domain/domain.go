@@ -5,12 +5,13 @@ import (
 )
 
 type Domain struct {
-	SoftwareRepository            SoftwareRepositoryInterface
-	ReleaseRepository             ReleaseRepositoryInterface
-	FileRepository                FileRepositoryInterface
-	DownloadService               DownloadServiceInterface
-	SoftwareUpdaterService        SoftwareUpdaterServiceInterface
-	SoftwareService               SoftwareServiceInterface
+	SoftwareRepository     SoftwareRepositoryInterface
+	ReleaseRepository      ReleaseRepositoryInterface
+	FileRepository         FileRepositoryInterface
+	DownloadService        DownloadServiceInterface
+	SoftwareUpdaterService SoftwareUpdaterServiceInterface
+	SoftwareService        SoftwareServiceInterface
+	FileService            FileServiceInterface
 }
 
 func NewDomain() Domain {
@@ -22,7 +23,7 @@ func NewDomain() Domain {
 	fileRepository := NewFileRepository()
 
 	softwareService := NewSoftwareService(softwareRepository)
-	
+
 	tic80Updater := NewSoftwareUpdaterTIC80Service(
 		softwareRepository,
 		releaseRepository,
