@@ -10,15 +10,15 @@ import (
 )
 
 type SoftwareController struct {
-	service domain.SoftwareServiceInterface
+	softwareService domain.SoftwareServiceInterface
 }
 
-func NewSoftwareController(service domain.SoftwareServiceInterface) *SoftwareController {
-	return &SoftwareController{service: service}
+func NewSoftwareController(software_service domain.SoftwareServiceInterface) *SoftwareController {
+	return &SoftwareController{softwareService: software_service}
 }
 
 func (c *SoftwareController) index(w http.ResponseWriter, r *http.Request) {
-	softwares, err := c.service.List()
+	softwares, err := c.softwareService.List()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -33,25 +33,37 @@ func (c *SoftwareController) index(w http.ResponseWriter, r *http.Request) {
 	tmpl.Execute(w, softwares)
 }
 
-func (c *SoftwareController) releases(w http.ResponseWriter, r *http.Request) {
+type SoftwareShowData struct {
+	Software      *domain.Software
+	LatestVersion string
+}
+
+func (c *SoftwareController) show(w http.ResponseWriter, r *http.Request) {
 	name := chi.URLParam(r, "name")
-	software, err := c.service.GetByNameWithReleases(name)
-	if err != nil {
-		if err == domain.ErrSoftwareNotFound {
-			http.Error(w, "Software not found", http.StatusNotFound)
-			return
-		}
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
 
-	tmpl, err := template_utils.GetTemplate("software_releases", "http/views/shared/layout.html", "http/views/software/releases.html")
+	software, err := c.softwareService.GetByName(name)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	if software == nil {
+		http.NotFound(w, r)
+		return
+	}
 
-	tmpl.Execute(w, map[string]interface{}{
-		"Software": software,
+	latest_release, err := c.softwareService.GetLatestRelease(software.Name)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if latest_release == nil {
+		http.NotFound(w, r)
+		return
+	}
+
+	tmpl, _ := template_utils.GetTemplate("software_show", "http/views/shared/layout.html", "http/views/software/show.html")
+	tmpl.Execute(w, SoftwareShowData{
+		Software:      software,
+		LatestVersion: latest_release.Version,
 	})
 }

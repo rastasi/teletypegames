@@ -9,19 +9,20 @@ type SoftwareListDTO struct {
 
 type SoftwareServiceInterface interface {
 	List() ([]SoftwareListDTO, error)
-	GetByNameWithReleases(name string) (*Software, error)
+	GetByName(name string) (*Software, error)
+	GetLatestRelease(softwareID string) (*Release, error)
 }
 
 type SoftwareService struct {
-	repository SoftwareRepositoryInterface
+	softeare_repository SoftwareRepositoryInterface
 }
 
-func NewSoftwareService(repository SoftwareRepositoryInterface) *SoftwareService {
-	return &SoftwareService{repository: repository}
+func NewSoftwareService(softeare_repository SoftwareRepositoryInterface) *SoftwareService {
+	return &SoftwareService{softeare_repository: softeare_repository}
 }
 
 func (s *SoftwareService) List() ([]SoftwareListDTO, error) {
-	softwares, err := s.repository.List()
+	softwares, err := s.softeare_repository.List()
 	if err != nil {
 		return nil, err
 	}
@@ -41,6 +42,23 @@ func (s *SoftwareService) List() ([]SoftwareListDTO, error) {
 	return dtos, nil
 }
 
-func (s *SoftwareService) GetByNameWithReleases(name string) (*Software, error) {
-	return s.repository.GetByName(name)
+func (s *SoftwareService) GetByName(name string) (*Software, error) {
+	return s.softeare_repository.GetByName(name)
+}
+
+func (s *SoftwareService) GetLatestRelease(softwareID string) (*Release, error) {
+	software, err := s.softeare_repository.GetByName(softwareID)
+	if err != nil {
+		return nil, err
+	}
+	if software == nil {
+		return nil, nil
+	}
+	if len(software.Releases) == 0 {
+		return nil, nil
+	}
+	sort.Slice(software.Releases, func(i, j int) bool {
+		return software.Releases[i].CreatedAt.After(software.Releases[j].CreatedAt)
+	})
+	return &software.Releases[0], nil
 }

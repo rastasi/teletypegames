@@ -26,7 +26,7 @@ func (c *PlayController) Play(w http.ResponseWriter, r *http.Request) {
 	name := chi.URLParam(r, "name")
 	version := chi.URLParam(r, "version")
 
-	software, err := c.softwareService.GetByNameWithReleases(name)
+	software, err := c.softwareService.GetByName(name)
 	if err != nil {
 		if err == domain.ErrSoftwareNotFound {
 			http.Error(w, "Software not found", http.StatusNotFound)

@@ -7,11 +7,11 @@
         <div class="card h-100">
             <div class="card-body">
                 <h5 class="card-title">Version: {{.Version}}</h5>
-                <h6 class="card-subtitle mb-2 text-muted">Released At: {{.CreatedAt.Format "2006-01-02 15:04:05"}}</h6>
+                <p class="card-subtitle mb-2 text-muted">Released At: {{.CreatedAt.Format "2006-01-02 15:04:05"}}</p>
             </div>
             <div class="card-footer">
                 <div class="btn-group d-flex justify-content-center" role="group" aria-label="Operations">
-                    {{if .WebPlayable}}
+                    {{if .HTMLFolderPath != ""}}
                         <a href="/play/{{$.Software.Name}}/{{.Version}}" class="btn btn-success btn-sm">Play</a>
                     {{end}}
                     <a href="/download/{{$.Software.Name}}/{{.Version}}/source" class="btn btn-primary btn-sm">Source</a>
