@@ -11,7 +11,7 @@
             </div>
             <div class="card-footer">
                 <div class="btn-group d-flex justify-content-center" role="group" aria-label="Operations">
-                    {{if .HTMLFolderPath != ""}}
+                    {{if .HTMLFolderPath}}
                         <a href="/play/{{$.Software.Name}}/{{.Version}}" class="btn btn-success btn-sm">Play</a>
                     {{end}}
                     <a href="/download/{{$.Software.Name}}/{{.Version}}/source" class="btn btn-primary btn-sm">Source</a>
