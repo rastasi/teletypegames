@@ -6,7 +6,6 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
 type FileRepositoryInterface interface {
@@ -65,52 +64,38 @@ func (fr *FileRepository) UnzipFile(path, destPath string) error {
 	fullPath := fr.GetPath(path)
 	fullDestPath := fr.GetPath(destPath)
 
-	reader, err := zip.OpenReader(fullPath)
+	r, err := zip.OpenReader(fullPath)
 	if err != nil {
-		return fmt.Errorf("failed to open zip file: %w", err)
+		return err
 	}
-	defer reader.Close()
+	defer r.Close()
 
-	if err := os.MkdirAll(fullDestPath, 0755); err != nil {
-		return fmt.Errorf("failed to create destination directory: %w", err)
-	}
+	for _, f := range r.File {
+		path := filepath.Join(fullDestPath, f.Name)
 
-	for _, file := range reader.File {
-		if err := extractZipFile(file, fullDestPath); err != nil {
-			return fmt.Errorf("failed to extract %s: %w", file.Name, err)
+		if f.FileInfo().IsDir() {
+			os.MkdirAll(path, 0755)
+			continue
+		}
+
+		os.MkdirAll(filepath.Dir(path), 0755)
+
+		in, err := f.Open()
+		if err != nil {
+			return err
+		}
+		defer in.Close()
+
+		out, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
+		if err != nil {
+			return err
+		}
+		defer out.Close()
+
+		_, err = io.Copy(out, in)
+		if err != nil {
+			return err
 		}
 	}
-
 	return nil
-}
-
-func extractZipFile(file *zip.File, destPath string) error {
-	filePath := filepath.Join(destPath, file.Name)
-
-	if !strings.HasPrefix(filePath, filepath.Clean(destPath)+string(os.PathSeparator)) {
-		return fmt.Errorf("invalid file path: %s", file.Name)
-	}
-
-	if file.FileInfo().IsDir() {
-		return os.MkdirAll(filePath, file.Mode())
-	}
-
-	if err := os.MkdirAll(filepath.Dir(filePath), 0755); err != nil {
-		return err
-	}
-
-	srcFile, err := file.Open()
-	if err != nil {
-		return err
-	}
-	defer srcFile.Close()
-
-	destFile, err := os.OpenFile(filePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, file.Mode())
-	if err != nil {
-		return err
-	}
-	defer destFile.Close()
-
-	_, err = io.Copy(destFile, srcFile)
-	return err
 }
