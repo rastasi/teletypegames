@@ -62,7 +62,7 @@ func (s *SoftwareUpdaterTIC80Service) Update(name, version string) error {
 		HTMLFolderPath: htmlFolderPath,
 	}
 
-	s.releaseRepository.Create(&release)
+	s.releaseRepository.CreateIfNotExist(&release)
 
 	fmt.Printf("TIC80 Updater: Successfully processed Lua cartridge: %s\n", name)
 	return nil

@@ -4,6 +4,7 @@ import "gorm.io/gorm"
 
 type ReleaseRepositoryInterface interface {
 	Create(release *Release) error
+	CreateIfNotExist(release *Release) error
 	FindLatestBySoftwareID(softwareID uint) (*Release, error)
 	FindBySoftwareIDAndVersion(softwareID uint, version string) (*Release, error)
 }
@@ -14,6 +15,18 @@ type ReleaseRepository struct {
 
 func (r *ReleaseRepository) Create(release *Release) error {
 	return r.db.Create(release).Error
+}
+
+func (r *ReleaseRepository) CreateIfNotExist(release *Release) error {
+	var existing Release
+	err := r.db.Where("software_id = ? AND version = ?", release.SoftwareID, release.Version).First(&existing).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return r.db.Create(release).Error
+		}
+		return err
+	}
+	return nil
 }
 
 func (r *ReleaseRepository) FindLatestBySoftwareID(softwareID uint) (*Release, error) {
