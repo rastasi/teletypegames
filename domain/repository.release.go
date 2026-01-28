@@ -5,9 +5,9 @@ import "gorm.io/gorm"
 type ReleaseRepositoryInterface interface {
 	Create(release *Release) error
 	CreateIfNotExist(release *Release) error
-	FindLatestBySoftwareID(softwareID uint) (*Release, error)
-	FindBySoftwareIDAndVersion(softwareID uint, version string) (*Release, error)
-	ListBySoftwareID(softwareID uint) []Release
+	FindLatestBySoftwareID(software_id uint) (*Release, error)
+	FindBySoftwareIDAndVersion(software_id uint, version string) (*Release, error)
+	ListBySoftwareID(software_id uint) []Release
 }
 
 type ReleaseRepository struct {
@@ -30,20 +30,20 @@ func (r *ReleaseRepository) CreateIfNotExist(release *Release) error {
 	return nil
 }
 
-func (r *ReleaseRepository) FindLatestBySoftwareID(softwareID uint) (*Release, error) {
+func (r *ReleaseRepository) FindLatestBySoftwareID(software_id uint) (*Release, error) {
 	var release Release
-	err := r.db.Where("software_id = ?", softwareID).Order("created_at desc").First(&release).Error
+	err := r.db.Where("software_id = ?", software_id).Order("created_at desc").First(&release).Error
 	return &release, err
 }
 
-func (r *ReleaseRepository) FindBySoftwareIDAndVersion(softwareID uint, version string) (*Release, error) {
+func (r *ReleaseRepository) FindBySoftwareIDAndVersion(software_id uint, version string) (*Release, error) {
 	var release Release
-	err := r.db.Where("software_id = ? AND version = ?", softwareID, version).First(&release).Error
+	err := r.db.Where("software_id = ? AND version = ?", software_id, version).First(&release).Error
 	return &release, err
 }
 
-func (r *ReleaseRepository) ListBySoftwareID(softwareID uint) []Release {
+func (r *ReleaseRepository) ListBySoftwareID(software_id uint) []Release {
 	var releases []Release
-	r.db.Where("software_id = ?", softwareID).Find(&releases)
+	r.db.Where("software_id = ?", software_id).Find(&releases)
 	return releases
 }

@@ -12,8 +12,8 @@ type SoftwareUpdaterService struct {
 	tic80Updater SoftwareUpdaterTIC80ServiceInterface
 }
 
-func NewSoftwareUpdaterService(tic80Updater SoftwareUpdaterTIC80ServiceInterface) *SoftwareUpdaterService {
-	return &SoftwareUpdaterService{tic80Updater: tic80Updater}
+func NewSoftwareUpdaterService(tic80_updater SoftwareUpdaterTIC80ServiceInterface) *SoftwareUpdaterService {
+	return &SoftwareUpdaterService{tic80Updater: tic80_updater}
 }
 
 func (s *SoftwareUpdaterService) Update(platform, name, version string) error {

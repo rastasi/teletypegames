@@ -18,31 +18,31 @@ func NewDomain() Domain {
 	DB := mysql_utils.Init()
 	MigrateGoDatabase(DB)
 
-	softwareRepository := &SoftwareRepository{db: DB}
-	releaseRepository := &ReleaseRepository{db: DB}
-	fileRepository := NewFileRepository()
+	software_repository := &SoftwareRepository{db: DB}
+	release_repository := &ReleaseRepository{db: DB}
+	file_repository := NewFileRepository()
 
-	softwareService := NewSoftwareService(softwareRepository, releaseRepository)
+	software_service := NewSoftwareService(software_repository, release_repository)
 
-	tic80Updater := NewSoftwareUpdaterTIC80Service(
-		softwareRepository,
-		releaseRepository,
-		fileRepository,
+	tic80_updater := NewSoftwareUpdaterTIC80Service(
+		software_repository,
+		release_repository,
+		file_repository,
 	)
 
-	softwareUpdaterService := NewSoftwareUpdaterService(tic80Updater)
+	software_updater_service := NewSoftwareUpdaterService(tic80_updater)
 
-	downloadService := NewDownloadService(softwareRepository, releaseRepository)
+	download_service := NewDownloadService(software_repository, release_repository)
 
-	fileService := NewFileService(fileRepository)
+	file_service := NewFileService(file_repository)
 
 	return Domain{
-		SoftwareRepository:     softwareRepository,
-		ReleaseRepository:      releaseRepository,
-		FileRepository:         fileRepository,
-		DownloadService:        downloadService,
-		SoftwareUpdaterService: softwareUpdaterService,
-		SoftwareService:        softwareService,
-		FileService:            fileService,
+		SoftwareRepository:     software_repository,
+		ReleaseRepository:      release_repository,
+		FileRepository:         file_repository,
+		DownloadService:        download_service,
+		SoftwareUpdaterService: software_updater_service,
+		SoftwareService:        software_service,
+		FileService:            file_service,
 	}
 }

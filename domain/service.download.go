@@ -11,8 +11,8 @@ var (
 )
 
 type DownloadServiceInterface interface {
-	GetLatestRelease(softwareName string) (*Release, error)
-	GetSpecificRelease(softwareName string, version string) (*Release, error)
+	GetLatestRelease(software_name string) (*Release, error)
+	GetSpecificRelease(software_name string, version string) (*Release, error)
 }
 
 type DownloadService struct {
@@ -20,15 +20,15 @@ type DownloadService struct {
 	releaseRepository  ReleaseRepositoryInterface
 }
 
-func NewDownloadService(softwareRepository SoftwareRepositoryInterface, releaseRepository ReleaseRepositoryInterface) *DownloadService {
+func NewDownloadService(software_repository SoftwareRepositoryInterface, release_repository ReleaseRepositoryInterface) *DownloadService {
 	return &DownloadService{
-		softwareRepository: softwareRepository,
-		releaseRepository:  releaseRepository,
+		softwareRepository: software_repository,
+		releaseRepository:  release_repository,
 	}
 }
 
-func (s *DownloadService) GetLatestRelease(softwareName string) (*Release, error) {
-	software, err := s.softwareRepository.GetByName(softwareName)
+func (s *DownloadService) GetLatestRelease(software_name string) (*Release, error) {
+	software, err := s.softwareRepository.GetByName(software_name)
 	if err != nil {
 		return nil, ErrSoftwareNotFound
 	}
@@ -41,8 +41,8 @@ func (s *DownloadService) GetLatestRelease(softwareName string) (*Release, error
 	return release, nil
 }
 
-func (s *DownloadService) GetSpecificRelease(softwareName string, version string) (*Release, error) {
-	software, err := s.softwareRepository.GetByName(softwareName)
+func (s *DownloadService) GetSpecificRelease(software_name string, version string) (*Release, error) {
+	software, err := s.softwareRepository.GetByName(software_name)
 	if err != nil {
 		return nil, ErrSoftwareNotFound
 	}

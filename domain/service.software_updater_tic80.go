@@ -18,14 +18,14 @@ type SoftwareUpdaterTIC80Service struct {
 }
 
 func NewSoftwareUpdaterTIC80Service(
-	softwareRepository SoftwareRepositoryInterface,
-	releaseRepository ReleaseRepositoryInterface,
-	fileRepository FileRepositoryInterface,
+	software_repository SoftwareRepositoryInterface,
+	release_repository ReleaseRepositoryInterface,
+	file_repository FileRepositoryInterface,
 ) *SoftwareUpdaterTIC80Service {
 	return &SoftwareUpdaterTIC80Service{
-		softwareRepository: softwareRepository,
-		releaseRepository:  releaseRepository,
-		fileRepository:     fileRepository,
+		softwareRepository: software_repository,
+		releaseRepository:  release_repository,
+		fileRepository:     file_repository,
 	}
 }
 
@@ -44,12 +44,12 @@ func (s *SoftwareUpdaterTIC80Service) Update(name, version string) error {
 
 	var err error
 
-	metaData, err := s.GetMetadata(source_path)
+	meta_data, err := s.GetMetadata(source_path)
 	if err != nil {
 		return err
 	}
 
-	software := s.BuildSoftware(metaData)
+	software := s.BuildSoftware(meta_data)
 
 	err = s.softwareRepository.UpdateOrCreate(software)
 	if err != nil {
@@ -84,15 +84,15 @@ func (s *SoftwareUpdaterTIC80Service) BuildSoftware(metadata map[string]string) 
 	return software
 }
 
-func (s *SoftwareUpdaterTIC80Service) GetMetadata(sourcePath string) (map[string]string, error) {
+func (s *SoftwareUpdaterTIC80Service) GetMetadata(source_path string) (map[string]string, error) {
 
-	file, err := os.Open(sourcePath)
+	file, err := os.Open(source_path)
 	if err != nil {
 		return nil, err
 	}
 	defer file.Close()
 
-	metaData := make(map[string]string)
+	meta_data := make(map[string]string)
 	scanner := bufio.NewScanner(file)
 
 	for scanner.Scan() {
@@ -104,7 +104,7 @@ func (s *SoftwareUpdaterTIC80Service) GetMetadata(sourcePath string) (map[string
 			}
 			key := strings.TrimSpace(parts[0])
 			val := strings.TrimSpace(parts[1])
-			metaData[strings.ToLower(key)] = val
+			meta_data[strings.ToLower(key)] = val
 		} else {
 			break
 		}
@@ -114,5 +114,5 @@ func (s *SoftwareUpdaterTIC80Service) GetMetadata(sourcePath string) (map[string
 		return nil, err
 	}
 
-	return metaData, nil
+	return meta_data, nil
 }

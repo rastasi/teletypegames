@@ -20,7 +20,7 @@ type SoftwareShowData struct {
 type SoftwareServiceInterface interface {
 	List() ([]SoftwareListDTO, error)
 	GetByName(name string) (*Software, error)
-	GetLatestRelease(softwareID string) (*Release, error)
+	GetLatestRelease(software_id string) (*Release, error)
 	GetForShowByName(name string) (*SoftwareShowData, error)
 }
 
@@ -100,8 +100,8 @@ func (s *SoftwareService) GetForShowByName(name string) (*SoftwareShowData, erro
 	}, nil
 }
 
-func (s *SoftwareService) GetLatestRelease(softwareID string) (*Release, error) {
-	software, err := s.softeare_repository.GetByName(softwareID)
+func (s *SoftwareService) GetLatestRelease(software_id string) (*Release, error) {
+	software, err := s.softeare_repository.GetByName(software_id)
 	if err != nil {
 		return nil, err
 	}

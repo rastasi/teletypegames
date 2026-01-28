@@ -13,8 +13,8 @@ type FileRepositoryInterface interface {
 	FileExists(path string) bool
 	CreateDir(path string) error
 	DeleteFile(path string) error
-	MoveFile(srcPath, destPath string) error
-	UnzipFile(path, destPath string) error
+	MoveFile(src_path, dest_path string) error
+	UnzipFile(path, dest_path string) error
 }
 
 type FileRepository struct {
@@ -22,9 +22,9 @@ type FileRepository struct {
 }
 
 func NewFileRepository() *FileRepository {
-	fileContainerPath, _ := os.LookupEnv("FILE_CONTAINER_PATH")
+	file_container_path, _ := os.LookupEnv("FILE_CONTAINER_PATH")
 	return &FileRepository{
-		fileContainerPath: fileContainerPath,
+		fileContainerPath: file_container_path,
 	}
 }
 
@@ -33,45 +33,45 @@ func (fr *FileRepository) GetPath(path string) string {
 }
 
 func (fr *FileRepository) FileExists(path string) bool {
-	fullPath := fr.GetPath(path)
-	_, err := os.Stat(fullPath)
+	full_path := fr.GetPath(path)
+	_, err := os.Stat(full_path)
 	return err == nil
 }
 
 func (fr *FileRepository) CreateDir(path string) error {
-	fullPath := fr.GetPath(path)
-	return os.MkdirAll(fullPath, 0755)
+	full_path := fr.GetPath(path)
+	return os.MkdirAll(full_path, 0755)
 }
 
 func (fr *FileRepository) DeleteFile(path string) error {
-	fullPath := fr.GetPath(path)
-	return os.RemoveAll(fullPath)
+	full_path := fr.GetPath(path)
+	return os.RemoveAll(full_path)
 }
 
-func (fr *FileRepository) MoveFile(srcPath, destPath string) error {
-	fullSrcPath := fr.GetPath(srcPath)
-	fullDestPath := fr.GetPath(destPath)
+func (fr *FileRepository) MoveFile(src_path, dest_path string) error {
+	full_src_path := fr.GetPath(src_path)
+	full_dest_path := fr.GetPath(dest_path)
 
-	destDir := filepath.Dir(fullDestPath)
-	if err := os.MkdirAll(destDir, 0755); err != nil {
+	dest_dir := filepath.Dir(full_dest_path)
+	if err := os.MkdirAll(dest_dir, 0755); err != nil {
 		return fmt.Errorf("failed to create destination directory: %w", err)
 	}
 
-	return os.Rename(fullSrcPath, fullDestPath)
+	return os.Rename(full_src_path, full_dest_path)
 }
 
-func (fr *FileRepository) UnzipFile(path, destPath string) error {
-	fullPath := fr.GetPath(path)
-	fullDestPath := fr.GetPath(destPath)
+func (fr *FileRepository) UnzipFile(path, dest_path string) error {
+	full_path := fr.GetPath(path)
+	full_dest_path := fr.GetPath(dest_path)
 
-	r, err := zip.OpenReader(fullPath)
+	r, err := zip.OpenReader(full_path)
 	if err != nil {
 		return err
 	}
 	defer r.Close()
 
 	for _, f := range r.File {
-		path := filepath.Join(fullDestPath, f.Name)
+		path := filepath.Join(full_dest_path, f.Name)
 		fmt.Printf("ZIP: Extracting %s\n", path)
 
 		if f.FileInfo().IsDir() {

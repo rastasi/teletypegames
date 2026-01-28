@@ -19,33 +19,33 @@ func NewDownloadController(service domain.DownloadServiceInterface) *DownloadCon
 	return &DownloadController{service: service}
 }
 
-func (c *DownloadController) serve(w http.ResponseWriter, r *http.Request, release *domain.Release, isSource bool) {
-	var filePath string
-	if isSource {
-		filePath = release.SourcePath
+func (c *DownloadController) serve(w http.ResponseWriter, r *http.Request, release *domain.Release, is_source bool) {
+	var file_path string
+	if is_source {
+		file_path = release.SourcePath
 	} else {
-		filePath = release.CartridgePath
+		file_path = release.CartridgePath
 	}
 
-	absFilePath, err := filepath.Abs(filePath)
+	abs_file_path, err := filepath.Abs(file_path)
 	if err != nil {
 		http.Error(w, "Invalid file path", http.StatusInternalServerError)
 		return
 	}
 
-	absContentsDir, err := filepath.Abs(os.Getenv("FILE_CONTAINER_PATH"))
+	abs_contents_dir, err := filepath.Abs(os.Getenv("FILE_CONTAINER_PATH"))
 	if err != nil {
 		http.Error(w, "Invalid contents directory path", http.StatusInternalServerError)
 		return
 	}
 
-	if !strings.HasPrefix(absFilePath, absContentsDir) {
+	if !strings.HasPrefix(abs_file_path, abs_contents_dir) {
 		http.Error(w, "Access denied", http.StatusForbidden)
 		return
 	}
 
-	w.Header().Set("Content-Disposition", "attachment; filename="+filepath.Base(filePath))
-	http.ServeFile(w, r, filePath)
+	w.Header().Set("Content-Disposition", "attachment; filename="+filepath.Base(file_path))
+	http.ServeFile(w, r, file_path)
 }
 
 func (c *DownloadController) handleError(w http.ResponseWriter, err error) {

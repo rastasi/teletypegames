@@ -15,18 +15,18 @@ type Router struct {
 }
 
 func NewRouter(
-	softwareController *SoftwareController,
-	softwareUpdaterController *SoftwareUpdaterController,
-	downloadController *DownloadController,
-	playController *PlayController,
-	rootController *RootController,
+	software_controller *SoftwareController,
+	software_updater_controller *SoftwareUpdaterController,
+	download_controller *DownloadController,
+	play_controller *PlayController,
+	root_controller *RootController,
 ) *Router {
 	return &Router{
-		softwareController:        softwareController,
-		softwareUpdaterController: softwareUpdaterController,
-		downloadController:        downloadController,
-		playController:            playController,
-		rootController:            rootController,
+		softwareController:        software_controller,
+		softwareUpdaterController: software_updater_controller,
+		downloadController:        download_controller,
+		playController:            play_controller,
+		rootController:            root_controller,
 	}
 }
 

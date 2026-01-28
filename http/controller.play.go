@@ -15,10 +15,10 @@ type PlayController struct {
 	fileService     domain.FileServiceInterface
 }
 
-func NewPlayController(softwareService domain.SoftwareServiceInterface, fileService domain.FileServiceInterface) *PlayController {
+func NewPlayController(software_service domain.SoftwareServiceInterface, file_service domain.FileServiceInterface) *PlayController {
 	return &PlayController{
-		softwareService: softwareService,
-		fileService:     fileService,
+		softwareService: software_service,
+		fileService:     file_service,
 	}
 }
 
@@ -36,15 +36,15 @@ func (c *PlayController) Play(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var webPlayableRelease *domain.Release
+	var web_playable_release *domain.Release
 	for _, release := range software.Releases {
 		if release.Version == version && release.HTMLFolderPath != "" {
-			webPlayableRelease = &release
+			web_playable_release = &release
 			break
 		}
 	}
 
-	if webPlayableRelease == nil {
+	if web_playable_release == nil {
 		http.Error(w, "No web-playable version found for this software", http.StatusNotFound)
 		return
 	}
@@ -57,7 +57,7 @@ func (c *PlayController) Play(w http.ResponseWriter, r *http.Request) {
 
 	tmpl.Execute(w, map[string]interface{}{
 		"Software":           software,
-		"WebPlayableRelease": webPlayableRelease,
+		"WebPlayableRelease": web_playable_release,
 	})
 }
 

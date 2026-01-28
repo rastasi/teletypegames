@@ -5,12 +5,12 @@ import (
 	"teletype_softwares/lib/http_utils"
 )
 
-func StartHttpServer(domainInstance domain.Domain) {
+func StartHttpServer(domain_instance domain.Domain) {
 	router := NewRouter(
-		NewSoftwareController(domainInstance.SoftwareService),
-		NewSoftwareUpdaterController(domainInstance.SoftwareUpdaterService),
-		NewDownloadController(domainInstance.DownloadService),
-		NewPlayController(domainInstance.SoftwareService, domainInstance.FileService),
+		NewSoftwareController(domain_instance.SoftwareService),
+		NewSoftwareUpdaterController(domain_instance.SoftwareUpdaterService),
+		NewDownloadController(domain_instance.DownloadService),
+		NewPlayController(domain_instance.SoftwareService, domain_instance.FileService),
 		NewRootController(),
 	).Init()
 
