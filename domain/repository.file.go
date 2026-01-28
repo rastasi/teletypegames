@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 type FileRepositoryInterface interface {
@@ -71,29 +72,40 @@ func (fr *FileRepository) UnzipFile(path, dest_path string) error {
 	defer r.Close()
 
 	for _, f := range r.File {
-		path := filepath.Join(full_dest_path, f.Name)
-		fmt.Printf("ZIP: Extracting %s\n", path)
+		// Prevent path traversal vulnerability
+		fpath := filepath.Join(full_dest_path, f.Name)
+		if !strings.HasPrefix(fpath, full_dest_path) {
+			return fmt.Errorf("%s: illegal file path", fpath)
+		}
+
+		fmt.Printf("ZIP: Extracting %s\n", fpath)
 
 		if f.FileInfo().IsDir() {
-			os.MkdirAll(path, 0755)
+			os.MkdirAll(fpath, 0755)
 			continue
 		}
 
-		os.MkdirAll(filepath.Dir(path), 0755)
+		if err = os.MkdirAll(filepath.Dir(fpath), 0755); err != nil {
+			return err
+		}
 
-		in, err := f.Open()
+		outFile, err := os.OpenFile(fpath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
 		if err != nil {
 			return err
 		}
-		defer in.Close()
 
-		out, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
+		rc, err := f.Open()
 		if err != nil {
+			outFile.Close() // Close outFile if f.Open fails
 			return err
 		}
-		defer out.Close()
 
-		_, err = io.Copy(out, in)
+		_, err = io.Copy(outFile, rc)
+
+		// Close the file readers/writers immediately after use
+		rc.Close()
+		outFile.Close()
+
 		if err != nil {
 			return err
 		}
