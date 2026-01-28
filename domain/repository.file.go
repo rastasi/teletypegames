@@ -72,6 +72,7 @@ func (fr *FileRepository) UnzipFile(path, destPath string) error {
 
 	for _, f := range r.File {
 		path := filepath.Join(fullDestPath, f.Name)
+		fmt.Printf("ZIP: Extracting %s\n", path)
 
 		if f.FileInfo().IsDir() {
 			os.MkdirAll(path, 0755)

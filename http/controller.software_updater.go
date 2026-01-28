@@ -15,7 +15,7 @@ func NewSoftwareUpdaterController(service domain.SoftwareUpdaterServiceInterface
 	return &SoftwareUpdaterController{service: service}
 }
 
-func (c *SoftwareUpdaterController) update(w http.ResponseWriter, r *http.Request) {
+func (c *SoftwareUpdaterController) Update(w http.ResponseWriter, r *http.Request) {
 	secret := r.URL.Query().Get("secret")
 	if secret != os.Getenv("UPDATE_SECRET") {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)

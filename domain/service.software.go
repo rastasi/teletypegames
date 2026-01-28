@@ -1,24 +1,42 @@
 package domain
 
-import "sort"
+import (
+	"fmt"
+	"sort"
+)
 
 type SoftwareListDTO struct {
 	Software
 	LatestRelease *Release
 }
 
+type SoftwareShowData struct {
+	Software           *Software
+	Releases           []Release
+	LatestRelease      *Release
+	WebPlayableRelease *Release
+}
+
 type SoftwareServiceInterface interface {
 	List() ([]SoftwareListDTO, error)
 	GetByName(name string) (*Software, error)
 	GetLatestRelease(softwareID string) (*Release, error)
+	GetForShowByName(name string) (*SoftwareShowData, error)
 }
 
 type SoftwareService struct {
 	softeare_repository SoftwareRepositoryInterface
+	release_repository  ReleaseRepositoryInterface
 }
 
-func NewSoftwareService(softeare_repository SoftwareRepositoryInterface) *SoftwareService {
-	return &SoftwareService{softeare_repository: softeare_repository}
+func NewSoftwareService(
+	softeare_repository SoftwareRepositoryInterface,
+	release_repository ReleaseRepositoryInterface,
+) *SoftwareService {
+	return &SoftwareService{
+		softeare_repository: softeare_repository,
+		release_repository:  release_repository,
+	}
 }
 
 func (s *SoftwareService) List() ([]SoftwareListDTO, error) {
@@ -44,6 +62,42 @@ func (s *SoftwareService) List() ([]SoftwareListDTO, error) {
 
 func (s *SoftwareService) GetByName(name string) (*Software, error) {
 	return s.softeare_repository.GetByName(name)
+
+}
+
+func (s *SoftwareService) GetForShowByName(name string) (*SoftwareShowData, error) {
+	software, err := s.softeare_repository.GetByName(name)
+	if err != nil {
+		return nil, err
+	}
+	if software == nil {
+		return nil, fmt.Errorf("software not found")
+	}
+
+	releases := s.release_repository.ListBySoftwareID(software.ID)
+
+	var latest_release *Release
+	if len(releases) > 0 {
+		sort.Slice(releases, func(i, j int) bool {
+			return releases[i].CreatedAt.After(releases[j].CreatedAt)
+		})
+		latest_release = &releases[0]
+	}
+
+	var web_payable_release *Release
+	for _, release := range releases {
+		if release.HTMLFolderPath != "" {
+			web_payable_release = &release
+			break
+		}
+	}
+
+	return &SoftwareShowData{
+		Software:           software,
+		Releases:           releases,
+		LatestRelease:      latest_release,
+		WebPlayableRelease: web_payable_release,
+	}, nil
 }
 
 func (s *SoftwareService) GetLatestRelease(softwareID string) (*Release, error) {

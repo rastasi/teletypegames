@@ -33,11 +33,11 @@ func NewRouter(
 func (r *Router) Init() *chi.Mux {
 	router := chi.NewRouter()
 
-	router.Get("/", r.rootController.index)
-	router.Get("/software", r.softwareController.index)
-	router.Get("/software/{name}", r.softwareController.show)
+	router.Get("/", r.rootController.Index)
+	router.Get("/software", r.softwareController.Index)
+	router.Get("/software/{name}", r.softwareController.Show)
 
-	router.Get("/update", r.softwareUpdaterController.update)
+	router.Get("/update", r.softwareUpdaterController.Update)
 	router.Get("/download/{name}/source", r.downloadController.GetLatestSource)
 	router.Get("/download/{name}/cartridge", r.downloadController.GetLatestCartridge)
 	router.Get("/download/{name}/{version}/source", r.downloadController.GetSource)

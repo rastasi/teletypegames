@@ -1,8 +1,39 @@
 {{define "content"}}
-<h1 class="my-4">Releases for {{.Software.Title}}</h1>
-
 <div class="row">
-    {{range .Software.Releases}}
+    <div class="col-12 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">{{.Software.Title}}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">{{.Software.Author}}</h6>
+                <p class="card-text">{{.Software.Desc}}</p>
+                <p class="card-text"><strong>Version:</strong> {{.LatestRelease.Version}}</p>
+                <p class="card-text"><strong>License:</strong> {{.Software.License}}</p>
+                <p class="card-text"><a href="{{.Software.Site}}" target="_blank">Website</a></p>
+            </div>
+            <div class="card-footer">
+                <div class="btn-group d-flex justify-content-end" role="group" aria-label="Operations">
+                    <a href="/download/{{.Software.Name}}/source" class="btn btn-primary btn-sm">Source</a>
+                    <a href="/download/{{.Software.Name}}/cartridge" class="btn btn-primary btn-sm">Cartridge</a>
+                    <a href="/software/{{.Software.Name}}" class="btn btn-primary btn-sm">Releases</a>
+                    <a href="/play/{{.Software.Name}}/{{.LatestRelease.Version}}" class="btn btn-primary btn-sm">Play</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+EEEE
+{{if .WebPlayableRelease}}
+<h3>Play</h3>
+<div class="mb-4">
+    <div class="ratio ratio-4x3" style="max-width: 960px; margin: 0 auto;">
+        <iframe id="gameFrame" src="/play/{{.Software.Name}}/{{.WebPlayableRelease.Version}}/content/index.html"
+            frameborder="0" allowfullscreen></iframe>
+    </div>
+</div>
+{{end}}
+<h3>Releases</h3>
+<div class="row">
+    {{range .Releases}}
     <div class="col-12 mb-4">
         <div class="card h-100">
             <div class="card-body">
@@ -12,10 +43,12 @@
             <div class="card-footer">
                 <div class="btn-group d-flex justify-content-center" role="group" aria-label="Operations">
                     {{if .HTMLFolderPath}}
-                        <a href="/play/{{$.Software.Name}}/{{.Version}}" class="btn btn-success btn-sm">Play</a>
+                    <a href="/play/{{$.Software.Name}}/{{.Version}}" class="btn btn-success btn-sm">Play</a>
                     {{end}}
-                    <a href="/download/{{$.Software.Name}}/{{.Version}}/source" class="btn btn-primary btn-sm">Source</a>
-                    <a href="/download/{{$.Software.Name}}/{{.Version}}/cartridge" class="btn btn-primary btn-sm">Cartridge</a>
+                    <a href="/download/{{$.Software.Name}}/{{.Version}}/source"
+                        class="btn btn-primary btn-sm">Source</a>
+                    <a href="/download/{{$.Software.Name}}/{{.Version}}/cartridge"
+                        class="btn btn-primary btn-sm">Cartridge</a>
                 </div>
             </div>
         </div>

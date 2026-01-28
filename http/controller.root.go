@@ -15,7 +15,7 @@ func NewRootController() *RootController {
 	return &RootController{}
 }
 
-func (c *RootController) index(w http.ResponseWriter, r *http.Request) {
+func (c *RootController) Index(w http.ResponseWriter, r *http.Request) {
 
 	tmpl, err := template_utils.GetTemplate("root_index", "http/views/shared/layout.html", "http/views/root/index.html")
 	if err != nil {

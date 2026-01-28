@@ -2,27 +2,14 @@
 <h1 class="my-4">Softwares</h1>
 
 <div class="row">
-    {{range .}}
     <div class="col-12 mb-4">
-        <div class="card h-100">
-            <div class="card-body">
-                <h5 class="card-title">{{.Title}}</h5>
-                <h6 class="card-subtitle mb-2 text-muted">{{.Author}}</h6>
-                <p class="card-text">{{.Desc}}</p>
-                <p class="card-text"><strong>Version:</strong> {{.LatestRelease.Version}}</p>
-                <p class="card-text"><strong>License:</strong> {{.License}}</p>
-                <p class="card-text"><a href="{{.Site}}" target="_blank">Website</a></p>
-            </div>
-            <div class="card-footer">
-                <div class="btn-group d-flex justify-content-end" role="group" aria-label="Operations">
-                    <a href="/download/{{.Name}}/source" class="btn btn-primary btn-sm">Source</a>
-                    <a href="/download/{{.Name}}/cartridge" class="btn btn-primary btn-sm">Cartridge</a>
-                    <a href="/software/{{.Name}}" class="btn btn-primary btn-sm">Releases</a>
-                    <a href="/play/{{.Name}}/{{.LatestRelease.Version}}" class="btn btn-primary btn-sm">Play</a>
-                </div>
-            </div>
-        </div>
+        <ul>
+            {{range .}}
+            <li>
+                <a href="/software/{{.Name}}">{{.Title}}</a>
+            </li>
+            {{end}}
+        </ul>
     </div>
-    {{end}}
 </div>
 {{end}}

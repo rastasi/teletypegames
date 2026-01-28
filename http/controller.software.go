@@ -17,7 +17,7 @@ func NewSoftwareController(software_service domain.SoftwareServiceInterface) *So
 	return &SoftwareController{softwareService: software_service}
 }
 
-func (c *SoftwareController) index(w http.ResponseWriter, r *http.Request) {
+func (c *SoftwareController) Index(w http.ResponseWriter, r *http.Request) {
 	softwares, err := c.softwareService.List()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -33,31 +33,12 @@ func (c *SoftwareController) index(w http.ResponseWriter, r *http.Request) {
 	tmpl.Execute(w, softwares)
 }
 
-type SoftwareShowData struct {
-	Software      *domain.Software
-	LatestRelease *domain.Release
-}
-
-func (c *SoftwareController) show(w http.ResponseWriter, r *http.Request) {
+func (c *SoftwareController) Show(w http.ResponseWriter, r *http.Request) {
 	name := chi.URLParam(r, "name")
 
-	software, err := c.softwareService.GetByName(name)
+	data, err := c.softwareService.GetForShowByName(name)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	if software == nil {
-		http.NotFound(w, r)
-		return
-	}
-
-	latest_release, err := c.softwareService.GetLatestRelease(software.Name)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	if latest_release == nil {
-		http.NotFound(w, r)
 		return
 	}
 
@@ -66,8 +47,6 @@ func (c *SoftwareController) show(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	tmpl.Execute(w, SoftwareShowData{
-		Software:      software,
-		LatestRelease: latest_release,
-	})
+	tmpl.Execute(w, data)
+
 }

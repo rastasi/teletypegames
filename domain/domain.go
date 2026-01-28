@@ -22,7 +22,7 @@ func NewDomain() Domain {
 	releaseRepository := &ReleaseRepository{db: DB}
 	fileRepository := NewFileRepository()
 
-	softwareService := NewSoftwareService(softwareRepository)
+	softwareService := NewSoftwareService(softwareRepository, releaseRepository)
 
 	tic80Updater := NewSoftwareUpdaterTIC80Service(
 		softwareRepository,

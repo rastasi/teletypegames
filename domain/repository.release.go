@@ -7,6 +7,7 @@ type ReleaseRepositoryInterface interface {
 	CreateIfNotExist(release *Release) error
 	FindLatestBySoftwareID(softwareID uint) (*Release, error)
 	FindBySoftwareIDAndVersion(softwareID uint, version string) (*Release, error)
+	ListBySoftwareID(softwareID uint) []Release
 }
 
 type ReleaseRepository struct {
@@ -39,4 +40,10 @@ func (r *ReleaseRepository) FindBySoftwareIDAndVersion(softwareID uint, version 
 	var release Release
 	err := r.db.Where("software_id = ? AND version = ?", softwareID, version).First(&release).Error
 	return &release, err
+}
+
+func (r *ReleaseRepository) ListBySoftwareID(softwareID uint) []Release {
+	var releases []Release
+	r.db.Where("software_id = ?", softwareID).Find(&releases)
+	return releases
 }
