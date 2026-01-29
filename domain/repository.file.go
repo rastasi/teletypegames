@@ -1,12 +1,10 @@
 package domain
 
 import (
-	"archive/zip"
 	"fmt"
-	"io"
 	"os"
+	"os/exec"
 	"path/filepath"
-	"strings"
 )
 
 type FileRepositoryInterface interface {
@@ -61,54 +59,21 @@ func (fr *FileRepository) MoveFile(src_path, dest_path string) error {
 	return os.Rename(full_src_path, full_dest_path)
 }
 
-func (fr *FileRepository) UnzipFile(path, dest_path string) error {
-	full_path := fr.GetPath(path)
-	full_dest_path := fr.GetPath(dest_path)
+func (fr *FileRepository) UnzipFile(path, destPath string) error {
+	fullPath := fr.GetPath(path)
+	fullDestPath := fr.GetPath(destPath)
 
-	r, err := zip.OpenReader(full_path)
-	if err != nil {
+	if err := os.MkdirAll(fullDestPath, 0755); err != nil {
 		return err
 	}
-	defer r.Close()
 
-	for _, f := range r.File {
-		// Prevent path traversal vulnerability
-		fpath := filepath.Join(full_dest_path, f.Name)
-		if !strings.HasPrefix(fpath, full_dest_path) {
-			return fmt.Errorf("%s: illegal file path", fpath)
-		}
+	cmd := exec.Command("unzip", "-q", fullPath, "-d", fullDestPath)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
 
-		fmt.Printf("ZIP: Extracting %s\n", fpath)
-
-		if f.FileInfo().IsDir() {
-			os.MkdirAll(fpath, 0755)
-			continue
-		}
-
-		if err = os.MkdirAll(filepath.Dir(fpath), 0755); err != nil {
-			return err
-		}
-
-		outFile, err := os.OpenFile(fpath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
-		if err != nil {
-			return err
-		}
-
-		rc, err := f.Open()
-		if err != nil {
-			outFile.Close() // Close outFile if f.Open fails
-			return err
-		}
-
-		_, err = io.Copy(outFile, rc)
-
-		// Close the file readers/writers immediately after use
-		rc.Close()
-		outFile.Close()
-
-		if err != nil {
-			return err
-		}
+	if err := cmd.Run(); err != nil {
+		return err
 	}
-	return nil
+
+	return os.Remove(fullPath)
 }
