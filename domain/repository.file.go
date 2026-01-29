@@ -65,13 +65,15 @@ func (fr *FileRepository) MoveFile(src_path, dest_path string) error {
 	return os.Rename(full_src_path, full_dest_path)
 }
 
-func (fr *FileRepository) UnzipFile(path, destPath string) error {
+func (fr *FileRepository) UnzipFile(zipfile, desc string) error {
+	zip_path := fr.GetPath(zipfile)
+	desc_path := fr.GetPath(desc)
 
-	if err := os.MkdirAll(destPath, 0755); err != nil {
+	if err := os.MkdirAll(desc_path, 0755); err != nil {
 		return err
 	}
 
-	cmd := exec.Command("unzip", "-q", path, "-d", destPath)
+	cmd := exec.Command("unzip", "-q", zip_path, "-d", desc_path)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
@@ -79,5 +81,5 @@ func (fr *FileRepository) UnzipFile(path, destPath string) error {
 		return err
 	}
 
-	return os.Remove(path)
+	return os.Remove(zip_path)
 }

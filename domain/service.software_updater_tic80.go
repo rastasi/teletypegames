@@ -35,19 +35,20 @@ func (s *SoftwareUpdaterTIC80Service) Update(name, version string) error {
 	versioned_name := name + "-" + version
 
 	zip_filename := versioned_name + ".html.zip"
-	zip_path := s.fileRepository.GetPath(zip_filename)
-	zip_folder_path := s.fileRepository.GetPath(versioned_name)
+	cartridge_filename := versioned_name + ".tic"
+	source_filename := versioned_name + ".lua"
+	html_dirname := versioned_name
 
-	if !s.fileRepository.FileExists(zip_folder_path) {
-		s.fileRepository.DeleteDir(zip_folder_path)
+	if !s.fileRepository.FileExists(html_dirname) {
+		s.fileRepository.DeleteDir(html_dirname)
 	}
 
-	s.fileRepository.CreateDir(zip_folder_path)
-	s.fileRepository.UnzipFile(zip_path, zip_folder_path)
+	s.fileRepository.CreateDir(html_dirname)
+	s.fileRepository.UnzipFile(zip_filename, html_dirname)
 
-	cartridge_path := s.fileRepository.GetPath(versioned_name + ".tic")
-	source_path := s.fileRepository.GetPath(versioned_name + ".lua")
-	html_folder_path := s.fileRepository.GetPath(versioned_name)
+	cartridge_path := s.fileRepository.GetPath((cartridge_filename))
+	source_path := s.fileRepository.GetPath(source_filename)
+	html_dir_path := s.fileRepository.GetPath(html_dirname)
 
 	var err error
 
@@ -68,7 +69,7 @@ func (s *SoftwareUpdaterTIC80Service) Update(name, version string) error {
 		Version:        version,
 		CartridgePath:  cartridge_path,
 		SourcePath:     source_path,
-		HTMLFolderPath: html_folder_path,
+		HTMLFolderPath: html_dir_path,
 	}
 
 	s.releaseRepository.CreateIfNotExist(&release)
