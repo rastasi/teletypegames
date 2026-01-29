@@ -39,7 +39,7 @@ func (s *SoftwareUpdaterTIC80Service) Update(name, version string) error {
 	source_filename := versioned_name + ".lua"
 	html_dirname := versioned_name
 
-	if !s.fileRepository.FileExists(html_dirname) {
+	if s.fileRepository.FileExists(html_dirname) {
 		s.fileRepository.DeleteDir(html_dirname)
 	}
 
