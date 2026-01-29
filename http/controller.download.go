@@ -12,11 +12,18 @@ import (
 )
 
 type DownloadController struct {
-	service domain.DownloadServiceInterface
+	downloadService domain.DownloadServiceInterface
+	softwareService domain.SoftwareServiceInterface
 }
 
-func NewDownloadController(service domain.DownloadServiceInterface) *DownloadController {
-	return &DownloadController{service: service}
+func NewDownloadController(
+	downloadService domain.DownloadServiceInterface,
+	softwareService domain.SoftwareServiceInterface,
+) *DownloadController {
+	return &DownloadController{
+		downloadService: downloadService,
+		softwareService: softwareService,
+	}
 }
 
 func (c *DownloadController) serve(w http.ResponseWriter, r *http.Request, release *domain.Release, is_source bool) {
@@ -62,7 +69,7 @@ func (c *DownloadController) handleError(w http.ResponseWriter, err error) {
 
 func (c *DownloadController) GetLatestSource(w http.ResponseWriter, r *http.Request) {
 	name := chi.URLParam(r, "name")
-	release, err := c.service.GetLatestRelease(name)
+	release, err := c.downloadService.GetLatestRelease(name)
 	if err != nil {
 		c.handleError(w, err)
 		return
@@ -73,7 +80,7 @@ func (c *DownloadController) GetLatestSource(w http.ResponseWriter, r *http.Requ
 
 func (c *DownloadController) GetLatestCartridge(w http.ResponseWriter, r *http.Request) {
 	name := chi.URLParam(r, "name")
-	release, err := c.service.GetLatestRelease(name)
+	release, err := c.downloadService.GetLatestRelease(name)
 	if err != nil {
 		c.handleError(w, err)
 		return
@@ -85,7 +92,7 @@ func (c *DownloadController) GetLatestCartridge(w http.ResponseWriter, r *http.R
 func (c *DownloadController) GetSource(w http.ResponseWriter, r *http.Request) {
 	name := chi.URLParam(r, "name")
 	version := chi.URLParam(r, "version")
-	release, err := c.service.GetSpecificRelease(name, version)
+	release, err := c.downloadService.GetSpecificRelease(name, version)
 	if err != nil {
 		c.handleError(w, err)
 		return
@@ -97,7 +104,7 @@ func (c *DownloadController) GetSource(w http.ResponseWriter, r *http.Request) {
 func (c *DownloadController) GetCartridge(w http.ResponseWriter, r *http.Request) {
 	name := chi.URLParam(r, "name")
 	version := chi.URLParam(r, "version")
-	release, err := c.service.GetSpecificRelease(name, version)
+	release, err := c.downloadService.GetSpecificRelease(name, version)
 	if err != nil {
 		c.handleError(w, err)
 		return

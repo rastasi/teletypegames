@@ -8,10 +8,10 @@ import (
 func StartHttpServer(domain_instance domain.Domain) {
 	router := NewRouter(
 		NewSoftwareController(domain_instance.SoftwareService),
-		NewSoftwareUpdaterController(domain_instance.SoftwareUpdaterService),
-		NewDownloadController(domain_instance.DownloadService),
+		NewSoftwareUpdaterController(domain_instance.SoftwareUpdaterService, domain_instance.SoftwareService),
+		NewDownloadController(domain_instance.DownloadService, domain_instance.SoftwareService),
 		NewPlayController(domain_instance.SoftwareService, domain_instance.FileService),
-		NewRootController(),
+		NewRootController(domain_instance.SoftwareService),
 	).Init()
 
 	http_utils.StartGenericHTTPServer(http_utils.StartGenericHTTPServerContext{

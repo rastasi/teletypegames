@@ -49,6 +49,12 @@ func (c *PlayController) Play(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	softwares, err := c.softwareService.List()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	tmpl, err := template_utils.GetTemplate("play_controller_play", "http/views/shared/layout.html", "http/views/play/play.html")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -58,6 +64,7 @@ func (c *PlayController) Play(w http.ResponseWriter, r *http.Request) {
 	tmpl.Execute(w, map[string]interface{}{
 		"Software":           software,
 		"WebPlayableRelease": web_playable_release,
+		"Softwares":          softwares,
 	})
 }
 

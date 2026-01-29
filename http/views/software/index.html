@@ -4,9 +4,9 @@
 <div class="row">
     <div class="col-12 mb-4">
         <ul>
-            {{range .}}
+            {{range .Softwares}}
             <li>
-                <a href="/software/{{.Name}}">{{.Title}}</a>
+                <a href="/software/{{.Software.Name}}">{{.Software.Title}}</a>
             </li>
             {{end}}
         </ul>

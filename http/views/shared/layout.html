@@ -21,9 +21,6 @@
                         <a class="nav-link" href="/">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/software">Softwares</a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link" href="https://www.youtube.com/@teletypegames" target="_blank">Youtube</a>
                     </li>
                     <li class="nav-item">
@@ -34,14 +31,32 @@
         </div>
     </header>
 
-    <div class="container mt-4 mb-4 content-border">
-        {{block "content" .}}{{end}}
+    <div class="container mt-4 mb-4">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="content-border">
+                    <ul class="list-group">
+                        <li class="list-group-item disabled" aria-disabled="true">Softwares</li>
+                        {{range .Softwares}}
+                        <li class="list-group-item">
+                            <a href="/software/{{.Software.Name}}">{{.Software.Name}}</a>
+                        </li>
+                        {{end}}
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="content-border p-3">
+                    {{block "content" .}}{{end}}
+                </div>
+            </div>
+        </div>
     </div>
 
     <footer class="footer-border text-center py-3">
         <p>
             <a class="nav-link" href="http://teletype.hu" target="_blank">
-                Tasnádi Zsolt 2025
+                Teletype Games 2025-2026
             </a>
         </p>
     </footer>

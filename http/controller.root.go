@@ -8,14 +8,25 @@ import (
 )
 
 type RootController struct {
-	service domain.SoftwareServiceInterface
+	softwareService domain.SoftwareServiceInterface
 }
 
-func NewRootController() *RootController {
-	return &RootController{}
+func NewRootController(softwareService domain.SoftwareServiceInterface) *RootController {
+	return &RootController{
+		softwareService: softwareService,
+	}
 }
 
 func (c *RootController) Index(w http.ResponseWriter, r *http.Request) {
+	softwares, err := c.softwareService.List()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	data := map[string]interface{}{
+		"Softwares": softwares,
+	}
 
 	tmpl, err := template_utils.GetTemplate("root_index", "http/views/shared/layout.html", "http/views/root/index.html")
 	if err != nil {
@@ -23,5 +34,5 @@ func (c *RootController) Index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl.Execute(w, nil)
+	tmpl.Execute(w, data)
 }
