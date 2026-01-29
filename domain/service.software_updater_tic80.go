@@ -34,9 +34,16 @@ func (s *SoftwareUpdaterTIC80Service) Update(name, version string) error {
 
 	versioned_name := name + "-" + version
 
-	zip_path := s.fileRepository.GetPath(versioned_name + ".html.zip")
-	s.fileRepository.CreateDir(versioned_name)
-	s.fileRepository.UnzipFile(zip_path, versioned_name)
+	zip_filename := versioned_name + ".html.zip"
+	zip_path := s.fileRepository.GetPath(zip_filename)
+	zip_folder_path := s.fileRepository.GetPath(versioned_name)
+
+	if !s.fileRepository.FileExists(zip_folder_path) {
+		s.fileRepository.DeleteDir(zip_folder_path)
+	}
+
+	s.fileRepository.CreateDir(zip_folder_path)
+	s.fileRepository.UnzipFile(zip_path, zip_folder_path)
 
 	cartridge_path := s.fileRepository.GetPath(versioned_name + ".tic")
 	source_path := s.fileRepository.GetPath(versioned_name + ".lua")

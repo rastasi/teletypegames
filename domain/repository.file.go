@@ -11,6 +11,7 @@ type FileRepositoryInterface interface {
 	GetPath(path string) string
 	FileExists(path string) bool
 	CreateDir(path string) error
+	DeleteDir(path string) error
 	DeleteFile(path string) error
 	MoveFile(src_path, dest_path string) error
 	UnzipFile(path, dest_path string) error
@@ -42,6 +43,11 @@ func (fr *FileRepository) CreateDir(path string) error {
 	return os.MkdirAll(full_path, 0755)
 }
 
+func (fr *FileRepository) DeleteDir(path string) error {
+	full_path := fr.GetPath(path)
+	return os.RemoveAll(full_path)
+}
+
 func (fr *FileRepository) DeleteFile(path string) error {
 	full_path := fr.GetPath(path)
 	return os.RemoveAll(full_path)
@@ -60,14 +66,12 @@ func (fr *FileRepository) MoveFile(src_path, dest_path string) error {
 }
 
 func (fr *FileRepository) UnzipFile(path, destPath string) error {
-	fullPath := fr.GetPath(path)
-	fullDestPath := fr.GetPath(destPath)
 
-	if err := os.MkdirAll(fullDestPath, 0755); err != nil {
+	if err := os.MkdirAll(destPath, 0755); err != nil {
 		return err
 	}
 
-	cmd := exec.Command("unzip", "-q", fullPath, "-d", fullDestPath)
+	cmd := exec.Command("unzip", "-q", path, "-d", destPath)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
@@ -75,5 +79,5 @@ func (fr *FileRepository) UnzipFile(path, destPath string) error {
 		return err
 	}
 
-	return os.Remove(fullPath)
+	return os.Remove(path)
 }
