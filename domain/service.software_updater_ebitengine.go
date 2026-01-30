@@ -43,7 +43,7 @@ func (s *SoftwareUpdaterEbitengineService) Update(name, version string) error {
 	versioned_name := name + "-" + version
 
 	zip_filename := versioned_name + ".html.zip"
-	metadata_filename := versioned_name + ".meta.json"
+	metadata_filename := versioned_name + ".metadata.json"
 	html_dirname := versioned_name
 
 	fmt.Printf("Ebitengine Updater: Processing zip file: %s\n", zip_filename)
