@@ -99,7 +99,9 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.phpmyadmin.rule=Host(`${PHPMYADMIN_DOMAIN}`)"
       - "traefik.http.routers.phpmyadmin.entrypoints=web"
+      - "traefik.http.routers.phpmyadmin.middlewares=phpmyadmin-auth"
       - "traefik.http.services.phpmyadmin.loadbalancer.server.port=80"
+      - "traefik.http.middlewares.phpmyadmin-auth.basicauth.users=${PHPMYADMIN_AUTH}"
       - "traefik.docker.network=proxy"
     networks:
       - proxy
