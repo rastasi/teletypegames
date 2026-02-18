@@ -8,6 +8,8 @@ WOODPECKER_TECHNICAL_DOMAIN=woodpecker.vps.teletype.hu
 WEBAPP_DOMAIN=games.teletype.hu
 WEBAPP_TECHNICAL_DOMAIN=games.vps.teletype.hu
 
+PHPMYADMIN_DOMAIN=db.teletype.hu
+
 # Ports
 GITEA_SSH_PORT=2222
 DROPAREA_SSH_PORT=2223
