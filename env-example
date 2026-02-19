@@ -9,7 +9,6 @@ WEBAPP_DOMAIN=games.teletype.hu
 WEBAPP_TECHNICAL_DOMAIN=games.vps.teletype.hu
 
 PHPMYADMIN_DOMAIN=db.teletype.hu
-PHPMYADMIN_AUTH=user:$$apr1$$xxxxxxxx$$yyyyyyyyyyyyyyyyyyyyyy
 
 # Ports
 GITEA_SSH_PORT=2222

@@ -2,4 +2,5 @@ tmp
 softwares
 teletype_softwares
 .env
+pma-config.user.inc.php
 data
