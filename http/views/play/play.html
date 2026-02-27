@@ -8,6 +8,9 @@
 <div style="max-width: 960px; margin: 10px auto; text-align: center;">
     <div class="btn-group" role="group" aria-label="Game controls">
         <a href="/releases/{{.Software.Name}}" class="btn btn-primary">Back to Releases</a>
+        {{if .WebPlayableRelease.DocsFolderPath}}
+            <a href="/docs/{{.Software.Name}}/{{.WebPlayableRelease.Version}}" class="btn btn-info">Docs</a>
+        {{end}}
         <button id="fullscreenButton" class="btn btn-secondary">Fullscreen</button>
     </div>
 </div>

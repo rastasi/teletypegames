@@ -35,27 +35,41 @@ func (s *SoftwareUpdaterTIC80Service) Update(name, version string) error {
 	versioned_name := name + "-" + version
 
 	zip_filename := versioned_name + ".html.zip"
+	docs_zip_filename := versioned_name + "-docs.zip"
 	cartridge_filename := versioned_name + ".tic"
 	source_filename := versioned_name + ".lua"
 	html_dirname := versioned_name
+	docs_dirname := versioned_name + "-docs"
 
 	fmt.Printf("TIC80 Updater: Processing zip file: %s\n", zip_filename)
+	fmt.Printf("TIC80 Updater: Processing docs zip file: %s\n", docs_zip_filename)
 	fmt.Printf("TIC80 Updater: Processing cartridge file: %s\n", cartridge_filename)
 	fmt.Printf("TIC80 Updater: Processing source file: %s\n", source_filename)
 	fmt.Printf("TIC80 Updater: Processing HTML directory: %s\n", html_dirname)
+	fmt.Printf("TIC80 Updater: Processing docs directory: %s\n", docs_dirname)
 
 	if s.fileRepository.FileExists(html_dirname) {
 		fmt.Printf("TIC80 Updater: Removing existing HTML directory: %s\n", html_dirname)
 		s.fileRepository.DeleteDir(html_dirname)
 	}
 
+	if s.fileRepository.FileExists(docs_dirname) {
+		fmt.Printf("TIC80 Updater: Removing existing docs directory: %s\n", docs_dirname)
+		s.fileRepository.DeleteDir(docs_dirname)
+	}
+
 	s.fileRepository.CreateDir(html_dirname)
 	fmt.Printf("TIC80 Updater: Unzipping file: %s to directory: %s\n", zip_filename, html_dirname)
 	s.fileRepository.UnzipFile(zip_filename, html_dirname)
 
+	s.fileRepository.CreateDir(docs_dirname)
+	fmt.Printf("TIC80 Updater: Unzipping docs file: %s to directory: %s\n", docs_zip_filename, docs_dirname)
+	s.fileRepository.UnzipFile(docs_zip_filename, docs_dirname)
+
 	cartridge_path := s.fileRepository.GetPath((cartridge_filename))
 	source_path := s.fileRepository.GetPath(source_filename)
 	html_dir_path := s.fileRepository.GetPath(html_dirname)
+	docs_dir_path := s.fileRepository.GetPath(docs_dirname)
 
 	var err error
 	fmt.Printf("TIC80 Updater: Extracting metadata from source file: %s\n", source_path)
@@ -66,7 +80,6 @@ func (s *SoftwareUpdaterTIC80Service) Update(name, version string) error {
 	}
 
 	software := s.BuildSoftware(meta_data)
-
 	err = s.softwareRepository.UpdateOrCreate(software)
 	if err != nil {
 		fmt.Printf("TIC80 Updater: Error updating or creating software: %s\n", err.Error())
@@ -80,6 +93,7 @@ func (s *SoftwareUpdaterTIC80Service) Update(name, version string) error {
 		CartridgePath:  cartridge_path,
 		SourcePath:     source_path,
 		HTMLFolderPath: html_dir_path,
+		DocsFolderPath: docs_dir_path,
 	}
 
 	s.releaseRepository.CreateIfNotExist(&release)
