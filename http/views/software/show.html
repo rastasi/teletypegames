@@ -18,7 +18,7 @@
                 <div class="btn-group d-flex justify-content-center" role="group" aria-label="Game controls">
                     <button id="fullscreenButton" class="btn btn-secondary btn-sm">Fullscreen</button>
                     {{if .WebPlayableRelease.DocsFolderPath}}
-                        <a href="/docs/{{.Software.Name}}/{{.WebPlayableRelease.Version}}" class="btn btn-info btn-sm">Docs</a>
+                        <a href="/docs/{{.Software.Name}}/{{.WebPlayableRelease.Version}}" class="btn btn-primary btn-sm">Docs</a>
                     {{end}}
                 </div>
             </div>
@@ -89,7 +89,7 @@
                     <a href="/download/{{$.Software.Name}}/{{.Version}}/cartridge"
                         class="btn btn-primary btn-sm">Cartridge</a>
                     {{if .DocsFolderPath}}
-                        <a href="/docs/{{$.Software.Name}}/{{.Version}}" class="btn btn-info btn-sm">Docs</a>
+                        <a href="/docs/{{$.Software.Name}}/{{.Version}}" class="btn btn-primary btn-sm">Docs</a>
                     {{end}}
                 </div>
             </div>

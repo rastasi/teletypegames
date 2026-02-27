@@ -47,6 +47,7 @@ func (r *Router) Init() *chi.Mux {
 	router.Get("/download/{name}/{version}/cartridge", r.downloadController.GetCartridge)
 	router.Get("/play/{name}/{version}", r.playController.Play)
 	router.Get("/play/{name}/{version}/content*", r.playController.ServeContent)
+	router.Get("/docs/{name}/{version}", r.docsController.ServeDocs)
 	router.Get("/docs/{name}/{version}/*", r.docsController.ServeDocs)
 
 	fs := http.FileServer(http.Dir("assets"))

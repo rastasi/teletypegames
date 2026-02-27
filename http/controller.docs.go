@@ -48,7 +48,7 @@ func (c *DocsController) ServeDocs(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	docs_base_dir := c.fileService.GetPath(targetRelease.DocsFolderPath)
+	docs_base_dir := targetRelease.DocsFolderPath
 
 	if _, err := os.Stat(docs_base_dir); os.IsNotExist(err) {
 		http.Error(w, fmt.Sprintf("Documentation for '%s' version '%s' not found.", name, version), http.StatusNotFound)
@@ -58,6 +58,13 @@ func (c *DocsController) ServeDocs(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fs := http.StripPrefix(fmt.Sprintf("/docs/%s/%s", name, version), http.FileServer(http.Dir(docs_base_dir)))
+	prefix := fmt.Sprintf("/docs/%s/%s", name, version)
+
+	if r.URL.Path == prefix {
+		http.Redirect(w, r, prefix+"/", http.StatusMovedPermanently)
+		return
+	}
+
+	fs := http.StripPrefix(prefix, http.FileServer(http.Dir(docs_base_dir)))
 	fs.ServeHTTP(w, r)
 }
