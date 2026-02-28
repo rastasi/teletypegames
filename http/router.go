@@ -35,6 +35,7 @@ func NewRouter(
 
 func (r *Router) Init() *chi.Mux {
 	router := chi.NewRouter()
+	router.Use(CORSMiddleware)
 
 	router.Get("/", r.rootController.Index)
 	router.Get("/software", r.softwareController.Index)
