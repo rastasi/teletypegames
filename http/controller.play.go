@@ -72,6 +72,10 @@ func (c *PlayController) ServeContent(w http.ResponseWriter, r *http.Request) {
 	name := chi.URLParam(r, "name")
 	version := chi.URLParam(r, "version")
 
+	w.Header().Set("Cross-Origin-Opener-Policy", "same-origin")
+	w.Header().Set("Cross-Origin-Embedder-Policy", "require-corp")
+	w.Header().Set("Cross-Origin-Resource-Policy", "same-origin")
+
 	html_base_dir := c.fileService.GetPath(name + "-" + version)
 
 	if _, err := os.Stat(html_base_dir); os.IsNotExist(err) {
@@ -82,6 +86,10 @@ func (c *PlayController) ServeContent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fs := http.StripPrefix(fmt.Sprintf("/play/%s/%s/content", name, version), http.FileServer(http.Dir(html_base_dir)))
+	fs := http.StripPrefix(
+		fmt.Sprintf("/play/%s/%s/content", name, version),
+		http.FileServer(http.Dir(html_base_dir)),
+	)
+
 	fs.ServeHTTP(w, r)
 }
