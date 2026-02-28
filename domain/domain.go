@@ -35,7 +35,14 @@ func NewDomain() Domain {
 		release_repository,
 		file_repository,
 	)
-	software_updater_service := NewSoftwareUpdaterService(tic80_updater, ebitengine_updater)
+
+	love_updater := NewSoftwareUpdaterLoveService(
+		software_repository,
+		release_repository,
+		file_repository,
+	)
+
+	software_updater_service := NewSoftwareUpdaterService(tic80_updater, ebitengine_updater, love_updater)
 
 	download_service := NewDownloadService(software_repository, release_repository)
 
