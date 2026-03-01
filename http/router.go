@@ -57,9 +57,11 @@ func (r *Router) Init() *chi.Mux {
 	router.Get("/docs/{name}/{version}", r.docsController.ServeDocs)
 	router.Get("/docs/{name}/{version}/*", r.docsController.ServeDocs)
 
-	fs := http.FileServer(http.Dir("assets"))
-	router.Handle("/assets/*", http.StripPrefix("/assets/", fs))
-	router.Handle("/file", http.FileServer(http.Dir("/softwares")))
+	fs_assets := http.FileServer(http.Dir("assets"))
+	router.Handle("/assets/*", http.StripPrefix("/assets/", fs_assets))
+
+	fs_file := http.FileServer(http.Dir("/softwares"))
+	router.Handle("/file/*", http.StripPrefix("/file/", fs_file))
 
 	return router
 }
