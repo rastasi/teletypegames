@@ -11,14 +11,14 @@ type SoftwareListDTO struct {
 }
 
 type SoftwareDetaildListDTO struct {
-	Softwares []SoftwareShowData
+	Softwares []SoftwareShowData `json:"softwares"`
 }
 
 type SoftwareShowData struct {
-	Software           *Software
-	Releases           []Release
-	LatestRelease      *Release
-	WebPlayableRelease *Release
+	Software           *Software `json:"software"`
+	Releases           []Release `json:"releases"`
+	LatestRelease      *Release  `json:"latestRelease"`
+	WebPlayableRelease *Release  `json:"webPlayableRelease"`
 }
 
 type SoftwareServiceInterface interface {
