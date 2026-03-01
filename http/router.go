@@ -59,6 +59,7 @@ func (r *Router) Init() *chi.Mux {
 
 	fs := http.FileServer(http.Dir("assets"))
 	router.Handle("/assets/*", http.StripPrefix("/assets/", fs))
+	router.Handle("/file", http.FileServer(http.Dir("/softwares")))
 
 	return router
 }
