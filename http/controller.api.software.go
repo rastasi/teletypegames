@@ -16,30 +16,30 @@ func NewAPISoftwareController(software_service domain.SoftwareServiceInterface) 
 	return &APISoftwareController{softwareService: software_service}
 }
 
+func replaceReleasePaths(release *domain.Release) {
+	release.CartridgePath = strings.ReplaceAll(release.CartridgePath, "/softwares/", "/file/")
+	release.SourcePath = strings.ReplaceAll(release.SourcePath, "/softwares/", "/file/")
+	release.HTMLFolderPath = strings.ReplaceAll(release.HTMLFolderPath, "/softwares/", "/file/")
+	release.DocsFolderPath = strings.ReplaceAll(release.DocsFolderPath, "/softwares/", "/file/")
+}
+
 func (c *APISoftwareController) Index(w http.ResponseWriter, r *http.Request) {
 	softwares, _ := c.softwareService.DetailedList()
 
-	for _, softwareShowData := range softwares.Softwares {
+	for idx := range softwares.Softwares {
+		softwareShowData := &softwares.Softwares[idx]
+
 		for i := range softwareShowData.Releases {
-			release := &softwareShowData.Releases[i]
-			release.CartridgePath = strings.ReplaceAll(release.CartridgePath, "/softwares/", "/file/")
-			release.SourcePath = strings.ReplaceAll(release.SourcePath, "/softwares/", "/file/")
-			release.HTMLFolderPath = strings.ReplaceAll(release.HTMLFolderPath, "/softwares/", "/file/")
-			release.DocsFolderPath = strings.ReplaceAll(release.DocsFolderPath, "/softwares/", "/file/")
+			replaceReleasePaths(&softwareShowData.Releases[i])
 		}
+
+		// LatestRelease és WebPlayableRelease a Releases slice elemeire mutat,
+		// ezért ezeket külön is frissíteni kell, mivel értékmásolat kerülhet bele
 		if softwareShowData.LatestRelease != nil {
-			release := softwareShowData.LatestRelease
-			release.CartridgePath = strings.ReplaceAll(release.CartridgePath, "/softwares/", "/file/")
-			release.SourcePath = strings.ReplaceAll(release.SourcePath, "/softwares/", "/file/")
-			release.HTMLFolderPath = strings.ReplaceAll(release.HTMLFolderPath, "/softwares/", "/file/")
-			release.DocsFolderPath = strings.ReplaceAll(release.DocsFolderPath, "/softwares/", "/file/")
+			replaceReleasePaths(softwareShowData.LatestRelease)
 		}
 		if softwareShowData.WebPlayableRelease != nil {
-			release := softwareShowData.WebPlayableRelease
-			release.CartridgePath = strings.ReplaceAll(release.CartridgePath, "/softwares/", "/file/")
-			release.SourcePath = strings.ReplaceAll(release.SourcePath, "/softwares/", "/file/")
-			release.HTMLFolderPath = strings.ReplaceAll(release.HTMLFolderPath, "/softwares/", "/file/")
-			release.DocsFolderPath = strings.ReplaceAll(release.DocsFolderPath, "/softwares/", "/file/")
+			replaceReleasePaths(softwareShowData.WebPlayableRelease)
 		}
 	}
 

@@ -67,7 +67,6 @@ func (s *SoftwareService) List() ([]SoftwareListDTO, error) {
 
 func (s *SoftwareService) GetByName(name string) (*Software, error) {
 	return s.softeare_repository.GetByName(name)
-
 }
 
 func (s *SoftwareService) GetForShowByName(name string) (*SoftwareShowData, error) {
@@ -89,10 +88,10 @@ func (s *SoftwareService) GetForShowByName(name string) (*SoftwareShowData, erro
 		latest_release = &releases[0]
 	}
 
-	var web_payable_release *Release
-	for _, release := range releases {
-		if release.HTMLFolderPath != "" {
-			web_payable_release = &release
+	var web_playable_release *Release
+	for i := range releases {
+		if releases[i].HTMLFolderPath != "" {
+			web_playable_release = &releases[i] // fix: slice elem címe, nem a loop változóé
 			break
 		}
 	}
@@ -101,7 +100,7 @@ func (s *SoftwareService) GetForShowByName(name string) (*SoftwareShowData, erro
 		Software:           software,
 		Releases:           releases,
 		LatestRelease:      latest_release,
-		WebPlayableRelease: web_payable_release,
+		WebPlayableRelease: web_playable_release,
 	}, nil
 }
 
