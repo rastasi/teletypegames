@@ -7,6 +7,7 @@ import (
 )
 
 type Router struct {
+	apiSoftwareController     *APISoftwareController
 	softwareController        *SoftwareController
 	softwareUpdaterController *SoftwareUpdaterController
 	downloadController        *DownloadController
@@ -16,6 +17,7 @@ type Router struct {
 }
 
 func NewRouter(
+	api_software_controller *APISoftwareController,
 	software_controller *SoftwareController,
 	software_updater_controller *SoftwareUpdaterController,
 	download_controller *DownloadController,
@@ -24,6 +26,7 @@ func NewRouter(
 	docs_controller *DocsController,
 ) *Router {
 	return &Router{
+		apiSoftwareController:     api_software_controller,
 		softwareController:        software_controller,
 		softwareUpdaterController: software_updater_controller,
 		downloadController:        download_controller,
@@ -38,6 +41,9 @@ func (r *Router) Init() *chi.Mux {
 	router.Use(CORSMiddleware)
 
 	router.Get("/", r.rootController.Index)
+
+	router.Get("/api/software", r.apiSoftwareController.Index)
+
 	router.Get("/software", r.softwareController.Index)
 	router.Get("/software/{name}", r.softwareController.Show)
 

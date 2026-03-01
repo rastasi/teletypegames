@@ -10,6 +10,10 @@ type SoftwareListDTO struct {
 	LatestRelease *Release
 }
 
+type SoftwareDetaildListDTO struct {
+	Softwares []SoftwareShowData
+}
+
 type SoftwareShowData struct {
 	Software           *Software
 	Releases           []Release
@@ -19,6 +23,7 @@ type SoftwareShowData struct {
 
 type SoftwareServiceInterface interface {
 	List() ([]SoftwareListDTO, error)
+	DetailedList() (*SoftwareDetaildListDTO, error)
 	GetByName(name string) (*Software, error)
 	GetLatestRelease(software_id string) (*Release, error)
 	GetForShowByName(name string) (*SoftwareShowData, error)
@@ -115,4 +120,22 @@ func (s *SoftwareService) GetLatestRelease(software_id string) (*Release, error)
 		return software.Releases[i].CreatedAt.After(software.Releases[j].CreatedAt)
 	})
 	return &software.Releases[0], nil
+}
+
+func (s *SoftwareService) DetailedList() (*SoftwareDetaildListDTO, error) {
+	softwares, err := s.softeare_repository.List()
+	if err != nil {
+		return nil, err
+	}
+
+	dtos := make([]SoftwareShowData, 0, len(softwares))
+	for _, software := range softwares {
+		showData, err := s.GetForShowByName(software.Name)
+		if err != nil {
+			return nil, err
+		}
+		dtos = append(dtos, *showData)
+	}
+
+	return &SoftwareDetaildListDTO{Softwares: dtos}, nil
 }
