@@ -1,0 +1,37 @@
+---
+import Layout from '../layouts/Layout.astro';
+const BASE = "https://games.teletype.hu";
+const API = BASE + "/api/software";
+
+const res = await fetch(API);
+const json = await res.json();
+const softwares = json.softwares;
+---
+
+<Layout>
+  <header class="text-center py-16 bg-gradient-to-r from-purple-600 to-indigo-600 text-white">
+    <h1 class="text-5xl font-bold mb-4">Játékaink</h1>
+    <p class="text-xl max-w-xl mx-auto">Fedezd fel a TIC-80 és más platformokra készült játékokat, közvetlenül a böngészőből játszható verziókkal!</p>
+  </header>
+
+  <main class="max-w-6xl mx-auto py-12 px-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+    {softwares.map(({ software, webPlayableRelease }) => (
+      <div class="bg-white shadow-lg rounded-xl overflow-hidden hover:shadow-2xl transition-shadow duration-300">
+        <div class="p-6">
+          <h2 class="text-2xl font-semibold mb-2">{software.title}</h2>
+          <p class="text-gray-600 mb-4">{software.desc}</p>
+          <div class="text-sm text-gray-500 mb-4">
+            <div>Author: {software.author}</div>
+            <div>Platform: {software.platform}</div>
+          </div>
+          {webPlayableRelease?.htmlFolderPath && (
+            <a href={BASE + webPlayableRelease.htmlFolderPath} target="_blank"
+               class="inline-block bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors">
+              ▶ Play in Browser
+            </a>
+          )}
+        </div>
+      </div>
+    ))}
+  </main>
+</Layout>

@@ -6,10 +6,19 @@
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="icon" href="/favicon.ico" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
+		<title>Teletype Games</title>
 	</head>
 	<body>
-		<slot />
+		<header class="bg-gray-800 text-white p-4 flex justify-between items-center">
+			<a href="/" class="text-xl font-bold">Teletype Games</a>
+			<nav>
+				<a href="/" class="p-2">Home</a>
+				<a href="/catalog" class="p-2">Catalog</a>
+			</nav>
+		</header>
+		<main>
+			<slot />
+		</main>
 	</body>
 </html>
 
