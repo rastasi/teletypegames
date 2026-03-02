@@ -117,8 +117,10 @@ services:
       - /app/node_modules
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`${WEBAPP_DOMAIN}`) && PathPrefix(`/`) && PathPrefixStrip(`/api`)==false"
+      - "traefik.http.routers.frontend.rule=Host(`${WEBAPP_DOMAIN}`)"
       - "traefik.http.routers.frontend.entrypoints=web"
+      - "traefik.http.routers.frontend.middlewares=frontend-stripprefix@docker"
+      - "traefik.http.middlewares.frontend-stripprefix.stripprefix.prefixes=/api"
       - "traefik.http.services.frontend.loadbalancer.server.port=3000"
       - "traefik.docker.network=proxy"
     networks:
@@ -142,7 +144,7 @@ services:
         condition: service_healthy
     volumes:
       - ./data/softwares:/softwares
-      - ./:/app
+      - ./apps/catalog:/app
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.catalog.rule=Host(`${WEBAPP_DOMAIN}`) && PathPrefix(`/api`)"
