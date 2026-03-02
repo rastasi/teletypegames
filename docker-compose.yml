@@ -121,7 +121,7 @@ services:
       - "traefik.http.routers.frontend.entrypoints=web"
       - "traefik.http.routers.frontend.middlewares=frontend-stripprefix@docker"
       - "traefik.http.middlewares.frontend-stripprefix.stripprefix.prefixes=/api"
-      - "traefik.http.services.frontend.loadbalancer.server.port=3000"
+      - "traefik.http.services.frontend.loadbalancer.server.port=4321"
       - "traefik.docker.network=proxy"
     networks:
       - proxy
