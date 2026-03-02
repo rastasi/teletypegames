@@ -146,7 +146,7 @@ services:
       - ./apps/catalog:/app
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.catalog.rule=Host(`${WEBAPP_DOMAIN}`) && (PathPrefix(`/api`) || PathPrefix(`/file`))"
+      - "traefik.http.routers.catalog.rule=Host(`${WEBAPP_DOMAIN}`) && (PathPrefix(`/api`) || PathPrefix(`/file`) || PathPrefix(`/update`))"
       - "traefik.http.routers.catalog.entrypoints=web"
       - "traefik.http.routers.catalog.priority=10"
       - "traefik.http.services.catalog.loadbalancer.server.port=80"
