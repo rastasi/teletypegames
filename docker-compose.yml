@@ -103,12 +103,32 @@ services:
       - ./pma-config.user.inc.php:/etc/phpmyadmin/config.user.inc.php
     networks:
       - proxy
-
-  webapp:
+  frontend:
     build:
-      context: .
+      context: ./apps/frontend
       dockerfile: Dockerfile.development
-    container_name: teletype-softwares
+    container_name: frontend
+    environment:
+      - NODE_ENV=development
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./apps/frontend:/app
+      - /app/node_modules
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`${WEBAPP_DOMAIN}`) && PathPrefix(`/`) && PathPrefixStrip(`/api`)==false"
+      - "traefik.http.routers.frontend.entrypoints=web"
+      - "traefik.http.services.frontend.loadbalancer.server.port=3000"
+      - "traefik.docker.network=proxy"
+    networks:
+      - proxy
+
+  catalog:
+    build:
+      context: ./apps/catalog
+      dockerfile: Dockerfile.development
+    container_name: catalog
     environment:
       - DB_USER=root
       - DB_PASSWORD=${DB_PASSWORD}
@@ -125,10 +145,12 @@ services:
       - ./:/app
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.webapp.rule=Host(`${WEBAPP_DOMAIN}`) || Host(`${WEBAPP_TECHNICAL_DOMAIN}`)"
-      - "traefik.http.routers.webapp.entrypoints=web"
-      - "traefik.http.services.webapp.loadbalancer.server.port=80"
+      - "traefik.http.routers.catalog.rule=Host(`${WEBAPP_DOMAIN}`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.catalog.entrypoints=web"
+      - "traefik.http.routers.catalog.middlewares=catalog-stripprefix@docker"
+      - "traefik.http.services.catalog.loadbalancer.server.port=80"
       - "traefik.docker.network=proxy"
+      - "traefik.http.middlewares.catalog-stripprefix.stripprefix.prefixes=/api"
     networks:
       - proxy
   droparea:
