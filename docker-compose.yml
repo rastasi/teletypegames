@@ -110,8 +110,8 @@ services:
     container_name: frontend
     environment:
       - NODE_ENV=development
-    ports:
-      - "3000:3000"
+      - HOST=0.0.0.0 
+
     volumes:
       - ./apps/frontend:/app
       - /app/node_modules
@@ -119,8 +119,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.frontend.rule=Host(`${WEBAPP_DOMAIN}`)"
       - "traefik.http.routers.frontend.entrypoints=web"
-      - "traefik.http.routers.frontend.middlewares=frontend-stripprefix@docker"
-      - "traefik.http.middlewares.frontend-stripprefix.stripprefix.prefixes=/api"
+      - "traefik.http.routers.frontend.priority=1"
       - "traefik.http.services.frontend.loadbalancer.server.port=4321"
       - "traefik.docker.network=proxy"
     networks:
@@ -149,10 +148,9 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.catalog.rule=Host(`${WEBAPP_DOMAIN}`) && PathPrefix(`/api`)"
       - "traefik.http.routers.catalog.entrypoints=web"
-      - "traefik.http.routers.catalog.middlewares=catalog-stripprefix@docker"
+      - "traefik.http.routers.catalog.priority=10"
       - "traefik.http.services.catalog.loadbalancer.server.port=80"
       - "traefik.docker.network=proxy"
-      - "traefik.http.middlewares.catalog-stripprefix.stripprefix.prefixes=/api"
     networks:
       - proxy
   droparea:
@@ -181,3 +179,4 @@ volumes:
 
 networks:
   proxy:
+    name: proxy
