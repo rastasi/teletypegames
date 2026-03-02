@@ -8,31 +8,16 @@ import (
 
 type Router struct {
 	apiSoftwareController     *APISoftwareController
-	softwareController        *SoftwareController
 	softwareUpdaterController *SoftwareUpdaterController
-	downloadController        *DownloadController
-	playController            *PlayController
-	rootController            *RootController
-	docsController            *DocsController
 }
 
 func NewRouter(
 	api_software_controller *APISoftwareController,
-	software_controller *SoftwareController,
 	software_updater_controller *SoftwareUpdaterController,
-	download_controller *DownloadController,
-	play_controller *PlayController,
-	root_controller *RootController,
-	docs_controller *DocsController,
 ) *Router {
 	return &Router{
 		apiSoftwareController:     api_software_controller,
-		softwareController:        software_controller,
 		softwareUpdaterController: software_updater_controller,
-		downloadController:        download_controller,
-		playController:            play_controller,
-		rootController:            root_controller,
-		docsController:            docs_controller,
 	}
 }
 
@@ -40,25 +25,8 @@ func (r *Router) Init() *chi.Mux {
 	router := chi.NewRouter()
 	router.Use(CORSMiddleware)
 
-	router.Get("/", r.rootController.Index)
-
 	router.Get("/api/software", r.apiSoftwareController.Index)
-
-	router.Get("/software", r.softwareController.Index)
-	router.Get("/software/{name}", r.softwareController.Show)
-
 	router.Get("/update", r.softwareUpdaterController.Update)
-	router.Get("/download/{name}/source", r.downloadController.GetLatestSource)
-	router.Get("/download/{name}/cartridge", r.downloadController.GetLatestCartridge)
-	router.Get("/download/{name}/{version}/source", r.downloadController.GetSource)
-	router.Get("/download/{name}/{version}/cartridge", r.downloadController.GetCartridge)
-	router.Get("/play/{name}/{version}", r.playController.Play)
-	router.Get("/play/{name}/{version}/content*", r.playController.ServeContent)
-	router.Get("/docs/{name}/{version}", r.docsController.ServeDocs)
-	router.Get("/docs/{name}/{version}/*", r.docsController.ServeDocs)
-
-	fs_assets := http.FileServer(http.Dir("assets"))
-	router.Handle("/assets/*", http.StripPrefix("/assets/", fs_assets))
 
 	fs_file := http.FileServer(http.Dir("/softwares"))
 	router.Handle("/file/*", http.StripPrefix("/file/", fs_file))
