@@ -14,6 +14,7 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
     networks:
       - proxy
+      - interstack
 
   gitea:
     image: gitea/gitea:latest
@@ -34,6 +35,7 @@ services:
       - "traefik.docker.network=proxy"
     networks:
       - proxy
+      - interstack
 
   woodpecker-server:
     image: woodpeckerci/woodpecker-server:next-2a445a6663-alpine
@@ -57,6 +59,7 @@ services:
       - "traefik.docker.network=proxy"
     networks:
       - proxy
+      - interstack
 
   woodpecker-agent:
     image: woodpeckerci/woodpecker-agent:next-2a445a6663-alpine
@@ -69,6 +72,7 @@ services:
       - softwares:/softwares
     networks:
       - proxy
+      - interstack
 
   mysql:
     image: mysql:8
@@ -84,6 +88,7 @@ services:
       - ./data/mysql:/var/lib/mysql
     networks:
       - proxy
+      - interstack
 
   phpmyadmin:
     image: phpmyadmin:latest
@@ -103,6 +108,8 @@ services:
       - ./pma-config.user.inc.php:/etc/phpmyadmin/config.user.inc.php
     networks:
       - proxy
+      - interstack
+
   frontend:
     build:
       context: ./apps/frontend
@@ -124,6 +131,7 @@ services:
       - "traefik.docker.network=proxy"
     networks:
       - proxy
+      - interstack
 
   catalog:
     build:
@@ -153,6 +161,8 @@ services:
       - "traefik.docker.network=proxy"
     networks:
       - proxy
+      - interstack
+
   droparea:
     image: linuxserver/openssh-server
     container_name: droparea
@@ -170,6 +180,7 @@ services:
       - "${DROPAREA_SSH_PORT}:2222"
     networks:
       - proxy
+      - interstack
 
 volumes:
   gitea:
@@ -180,3 +191,6 @@ volumes:
 networks:
   proxy:
     name: proxy
+  interstack:
+    name: interstack
+    external: true
