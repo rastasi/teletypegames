@@ -117,9 +117,20 @@ const recentCommits = allCommits.slice(0, 20);
 ---
 
 <Layout>
-  <header class="text-center py-16 bg-gradient-to-r from-teal-600 to-green-600 text-white">
-    <h1 class="text-5xl font-bold mb-4">Recent Commits</h1>
-    <p class="text-xl max-w-xl mx-auto">Latest commits from public repositories on our Gitea instance.</p>
+  <header class="text-center py-20 bg-gradient-to-r from-teal-600 to-green-600 text-white">
+    <div class="max-w-4xl mx-auto px-4">
+      <h1 class="text-5xl md:text-6xl font-extrabold mb-6">Codebase</h1>
+      <p class="text-xl md:text-2xl text-teal-50 mb-10 leading-relaxed">
+        Explore our collection of open-source projects, study our source code, and contribute to our independent game development tools.
+      </p>
+      <a 
+        href="https://git.teletype.hu" 
+        target="_blank" 
+        class="inline-flex items-center gap-3 bg-white text-teal-700 px-8 py-4 rounded-xl hover:bg-teal-50 transition-all font-bold shadow-xl hover:scale-105 active:scale-95"
+      >
+        Open Gitea
+      </a>
+    </div>
   </header>
 
   <main class="max-w-6xl mx-auto py-12 px-4">
@@ -129,6 +140,25 @@ const recentCommits = allCommits.slice(0, 20);
         <span class="block sm:inline"> {error}</span>
       </div>
     )}
+
+    {!error && publicRepos.length > 0 && (
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+        {publicRepos.map((repo) => (
+          <div class="bg-white shadow-lg rounded-lg p-4">
+            <h3 class="text-xl font-semibold mb-2">
+              <a href={repo.html_url} target="_blank" class="text-blue-600 hover:text-blue-800">
+                {repo.owner.login}/{repo.name}
+              </a>
+            </h3>
+            {repo.description && <p class="text-gray-700 text-sm">{repo.description}</p>}
+            {repo.language && <p class="text-gray-500 text-xs mt-1">Language: {repo.language}</p>}
+            <p class="text-gray-500 text-xs mt-1">Updated: {new Date(repo.updated_at).toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric'})}</p>
+          </div>
+        ))}
+      </div>
+    )}
+
+    <h2 class="text-3xl font-bold mb-8 text-center text-gray-800">Recent Commits</h2>
 
     {!error && recentCommits.length === 0 && (
       <p class="text-center text-gray-600 text-lg">No recent commits found or accessible from public repositories.</p>
@@ -159,25 +189,5 @@ const recentCommits = allCommits.slice(0, 20);
         </div>
       ))}
     </div>
-
-    {!error && publicRepos.length > 0 && (
-      <section class="max-w-6xl mx-auto py-8 px-4">
-        <h2 class="text-3xl font-bold mb-6 text-center">Public Repositories</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {publicRepos.map((repo) => (
-            <div class="bg-white shadow-lg rounded-lg p-4">
-              <h3 class="text-xl font-semibold mb-2">
-                <a href={repo.html_url} target="_blank" class="text-blue-600 hover:text-blue-800">
-                  {repo.owner.login}/{repo.name}
-                </a>
-              </h3>
-              {repo.description && <p class="text-gray-700 text-sm">{repo.description}</p>}
-              {repo.language && <p class="text-gray-500 text-xs mt-1">Language: {repo.language}</p>}
-              <p class="text-gray-500 text-xs mt-1">Updated: {new Date(repo.updated_at).toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric'})}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-    )}
   </main>
 </Layout>
