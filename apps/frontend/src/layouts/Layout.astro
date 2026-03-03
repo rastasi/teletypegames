@@ -9,19 +9,41 @@
 		<title>Teletype Games</title>
 	</head>
 	<body>
-		<header class="bg-gray-800 text-white p-4 flex justify-between items-center">
+		<header class="bg-gray-800 text-white p-4 flex justify-between items-center relative">
 			<a href="/" class="text-xl font-bold">Teletype Games</a>
-			<nav>
-				<a href="/" class="p-2">Home</a>
-				<a href="/catalog" class="p-2">Catalog</a>
-				<a href="/news" class="p-2">News</a>
-				<a href="/code" class="p-2">Code</a>
+			
+			<!-- Desktop Navigation -->
+			<nav class="hidden md:flex space-x-4">
+				<a href="/" class="p-2 hover:text-purple-300 transition-colors duration-200">Home</a>
+				<a href="/catalog" class="p-2 hover:text-purple-300 transition-colors duration-200">Catalog</a>
+				<a href="/news" class="p-2 hover:text-purple-300 transition-colors duration-200">News</a>
+				<a href="/code" class="p-2 hover:text-purple-300 transition-colors duration-200">Code</a>
+			</nav>
+
+			<!-- Hamburger Button (Mobile only) -->
+			<button id="menu-toggle" class="md:hidden p-2 focus:outline-none focus:ring-2 focus:ring-purple-500 rounded-md">
+				<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+				</svg>
+			</button>
+
+			<!-- Mobile Navigation -->
+			<nav id="mobile-menu" class="hidden md:hidden absolute top-full left-0 w-full bg-gray-800 flex-col items-center py-4 space-y-2 z-50">
+				<a href="/" class="block p-2 w-full text-center hover:bg-gray-700 transition-colors duration-200">Home</a>
+				<a href="/catalog" class="block p-2 w-full text-center hover:bg-gray-700 transition-colors duration-200">Catalog</a>
+				<a href="/news" class="block p-2 w-full text-center hover:bg-gray-700 transition-colors duration-200">News</a>
+				<a href="/code" class="block p-2 w-full text-center hover:bg-gray-700 transition-colors duration-200">Code</a>
 			</nav>
 		</header>
 		<main>
 			<slot />
 		</main>
 	</body>
+	<script is:inline>
+		document.getElementById('menu-toggle').addEventListener('click', () => {
+			document.getElementById('mobile-menu').classList.toggle('hidden');
+		});
+	</script>
 </html>
 
 <style>
