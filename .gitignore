@@ -4,3 +4,4 @@ teletype_softwares
 .env
 pma-config.user.inc.php
 data
+apps/frontend/src/events.yaml
