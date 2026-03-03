@@ -110,8 +110,8 @@ services:
     container_name: frontend
     environment:
       - NODE_ENV=development
-      - HOST=0.0.0.0 
-
+      - HOST=0.0.0.0
+      - WEBAPP_GITEA_TOKEN=${WEBAPP_GITEA_TOKEN}
     volumes:
       - ./apps/frontend:/app
       - /app/node_modules

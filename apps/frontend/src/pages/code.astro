@@ -1,0 +1,183 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const GITEA_API_BASE_URL = 'https://git.teletype.hu/api/v1';
+const GITEA_TOKEN = import.meta.env.WEBAPP_GITEA_TOKEN;
+
+interface GiteaRepo {
+  owner: {
+    login: string;
+  };
+  name: string;
+  description: string;
+  language?: string;
+  html_url: string;
+  updated_at: string;
+}
+
+interface Commit {
+  sha: string;
+  message: string;
+  author: { name: string; email: string; };
+  date: string;
+  url: string;
+  repo: {
+    owner: string;
+    name: string;
+    html_url: string;
+  };
+}
+
+let allCommits: Commit[] = [];
+let error: string | null = null;
+let publicRepos: GiteaRepo[] = [];
+
+if (!GITEA_TOKEN) {
+  error = "Gitea API token (WEBAPP_GITEA_TOKEN) is not configured. Please set it in your .env file and docker-compose.yml.";
+} else {
+  try {
+    // Step 1: Fetch public repositories
+    const reposResponse = await fetch(`${GITEA_API_BASE_URL}/repos/search?q=&private=false&limit=50`, {
+      headers: {
+        'Authorization': `token ${GITEA_TOKEN}`,
+        'Accept': 'application/json'
+      }
+    });
+
+    if (!reposResponse.ok) {
+      const errorText = await reposResponse.text();
+      throw new Error(`Gitea API (repos/search) responded with status ${reposResponse.status}: ${errorText}`);
+    }
+
+    const reposData = await reposResponse.json();
+    publicRepos = reposData.data || [];
+
+    // Step 2: Fetch recent commits directly for each repository
+    const commitPromises = publicRepos.map(async (repo) => {
+      try {
+        const commitsResponse = await fetch(
+          `${GITEA_API_BASE_URL}/repos/${repo.owner.login}/${repo.name}/commits?limit=10&page=1`,
+          {
+            headers: {
+              'Authorization': `token ${GITEA_TOKEN}`,
+              'Accept': 'application/json'
+            }
+          }
+        );
+
+        if (!commitsResponse.ok) {
+          console.warn(`Failed to fetch commits for ${repo.owner.login}/${repo.name}: ${commitsResponse.status}`);
+          return [];
+        }
+
+        const commitsData = await commitsResponse.json();
+
+        if (!Array.isArray(commitsData)) {
+          console.warn(`Unexpected response for ${repo.owner.login}/${repo.name}:`, commitsData);
+          return [];
+        }
+
+        const commits: Commit[] = commitsData.map((c: any) => ({
+          sha: c.sha,
+          message: c.commit?.message ?? '',
+          author: {
+            name: c.commit?.author?.name ?? 'Unknown',
+            email: c.commit?.author?.email ?? '',
+          },
+          date: c.commit?.author?.date ?? c.created,
+          url: c.html_url,
+          repo: {
+            owner: repo.owner.login,
+            name: repo.name,
+            html_url: repo.html_url,
+          }
+        }));
+
+        return commits;
+      } catch (repoCommitError: any) {
+        console.warn(`Error fetching commits for ${repo.owner.login}/${repo.name}: ${repoCommitError.message}`);
+        return [];
+      }
+    });
+
+    const allCommitsArrays = await Promise.all(commitPromises);
+    allCommits = allCommitsArrays.flat();
+
+    // Step 3: Sort all commits by date descending
+    allCommits.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+  } catch (e: any) {
+    console.error('Failed to fetch Gitea data:', e);
+    error = `Failed to fetch Gitea data: ${e.message}`;
+  }
+}
+
+// Limit to top 20 commits for display
+const recentCommits = allCommits.slice(0, 20);
+---
+
+<Layout>
+  <header class="text-center py-16 bg-gradient-to-r from-teal-600 to-green-600 text-white">
+    <h1 class="text-5xl font-bold mb-4">Recent Commits</h1>
+    <p class="text-xl max-w-xl mx-auto">Latest commits from public repositories on our Gitea instance.</p>
+  </header>
+
+  <main class="max-w-6xl mx-auto py-12 px-4">
+    {error && (
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-8" role="alert">
+        <strong class="font-bold">Error!</strong>
+        <span class="block sm:inline"> {error}</span>
+      </div>
+    )}
+
+    {!error && recentCommits.length === 0 && (
+      <p class="text-center text-gray-600 text-lg">No recent commits found or accessible from public repositories.</p>
+    )}
+
+    <div class="space-y-4 mb-12">
+      {recentCommits.map((commit) => (
+        <div class="bg-white shadow-lg rounded-lg p-4 flex items-center space-x-4">
+          <div class="flex-shrink-0 text-3xl">
+            🚀
+          </div>
+          <div class="flex-grow">
+            <p class="text-gray-800 font-semibold">
+              <a href={commit.repo.html_url} target="_blank" class="text-blue-600 hover:text-blue-800">
+                <span class="font-bold">{commit.repo.owner}</span> / <span class="font-bold">{commit.repo.name}</span>
+              </a>
+              : <span class="text-gray-700">{commit.message.split('\n')[0]}</span>
+            </p>
+            <p class="text-gray-600 text-sm mt-1">
+              Authored by <span class="font-bold">{commit.author.name}</span> on {new Date(commit.date).toLocaleDateString('en-US', {
+                year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+              })}
+              <a href={commit.url} target="_blank" class="ml-2 text-blue-500 hover:text-blue-700">
+                <span class="font-mono text-xs">{commit.sha.substring(0, 7)}</span>
+              </a>
+            </p>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    {!error && publicRepos.length > 0 && (
+      <section class="max-w-6xl mx-auto py-8 px-4">
+        <h2 class="text-3xl font-bold mb-6 text-center">Public Repositories</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {publicRepos.map((repo) => (
+            <div class="bg-white shadow-lg rounded-lg p-4">
+              <h3 class="text-xl font-semibold mb-2">
+                <a href={repo.html_url} target="_blank" class="text-blue-600 hover:text-blue-800">
+                  {repo.owner.login}/{repo.name}
+                </a>
+              </h3>
+              {repo.description && <p class="text-gray-700 text-sm">{repo.description}</p>}
+              {repo.language && <p class="text-gray-500 text-xs mt-1">Language: {repo.language}</p>}
+              <p class="text-gray-500 text-xs mt-1">Updated: {new Date(repo.updated_at).toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric'})}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+    )}
+  </main>
+</Layout>
