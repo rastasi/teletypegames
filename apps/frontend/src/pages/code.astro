@@ -117,23 +117,23 @@ const recentCommits = allCommits.slice(0, 20);
 ---
 
 <Layout>
-  <header class="text-center py-20 bg-gradient-to-r from-teal-600 to-green-600 text-white">
-    <div class="max-w-4xl mx-auto px-4">
-      <h1 class="text-5xl md:text-6xl font-extrabold mb-6">Codebase</h1>
-      <p class="text-xl md:text-2xl text-teal-50 mb-10 leading-relaxed">
+  <header class="hero-section-gradient from-teal-600 to-green-600 py-20">
+    <div class="hero-container max-w-4xl">
+      <h1 class="hero-title">Codebase</h1>
+      <p class="hero-subtitle text-teal-50 mb-10">
         Explore our collection of open-source projects, study our source code, and contribute to our independent game development tools.
       </p>
       <a 
         href="https://git.teletype.hu" 
         target="_blank" 
-        class="inline-flex items-center gap-3 bg-white text-teal-700 px-8 py-4 rounded-xl hover:bg-teal-50 transition-all font-bold shadow-xl hover:scale-105 active:scale-95"
+        class="btn-hero-teal"
       >
         Open Gitea
       </a>
     </div>
   </header>
 
-  <main class="max-w-6xl mx-auto py-12 px-4">
+  <main class="main-container">
     {error && (
       <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-8" role="alert">
         <strong class="font-bold">Error!</strong>
@@ -142,9 +142,9 @@ const recentCommits = allCommits.slice(0, 20);
     )}
 
     {!error && publicRepos.length > 0 && (
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+      <div class="card-grid mb-16">
         {publicRepos.map((repo) => (
-          <div class="bg-white shadow-lg rounded-lg p-4">
+          <div class="card-base">
             <h3 class="text-xl font-semibold mb-2">
               <a href={repo.html_url} target="_blank" class="text-blue-600 hover:text-blue-800">
                 {repo.owner.login}/{repo.name}
@@ -166,7 +166,7 @@ const recentCommits = allCommits.slice(0, 20);
 
     <div class="space-y-4 mb-12">
       {recentCommits.map((commit) => (
-        <div class="bg-white shadow-lg rounded-lg p-4 flex items-center space-x-4">
+        <div class="bg-white shadow-lg rounded-lg p-4 flex items-center space-x-4 border border-gray-100">
           <div class="flex-shrink-0 text-3xl">
             🚀
           </div>

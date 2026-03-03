@@ -9,12 +9,14 @@ const softwares = json.softwares;
 ---
 
 <Layout>
-  <header class="text-center py-16 bg-gradient-to-r from-purple-600 to-indigo-600 text-white">
-    <h1 class="text-5xl font-bold mb-4">Our Games</h1>
-    <p class="text-xl max-w-xl mx-auto">Discover games made for TIC-80 and other platforms, with versions playable directly in your browser!</p>
+  <header class="hero-section-gradient from-purple-600 to-indigo-600 py-16">
+    <div class="hero-container">
+      <h1 class="hero-title">Our Games</h1>
+      <p class="hero-subtitle text-purple-50">Discover games made for TIC-80 and other platforms, with versions playable directly in your browser!</p>
+    </div>
   </header>
 
-  <main class="max-w-6xl mx-auto py-12 px-4 grid grid-cols-1 gap-8">
+  <main class="main-container py-12 px-4 grid grid-cols-1 gap-8 mt-0">
     {softwares.map(({ software, releases, latestRelease }) => (
       <div class="bg-white shadow-lg relative rounded-xl overflow-hidden hover:shadow-2xl transition-shadow duration-300">
         <div class="p-6 pr-28 sm:pr-6">
