@@ -163,6 +163,34 @@ services:
       - proxy
       - interstack
 
+  blog:
+    build:
+      context: ./apps/blog
+      dockerfile: Dockerfile.development
+    container_name: blog
+    environment:
+      - DB_USER=root
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_NAME=softwares
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - ./apps/blog:/app
+      - ./data/blog/uploads:/app/uploads
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.blog.rule=Host(`${WEBAPP_DOMAIN}`) && (PathPrefix(`/articles`) || PathPrefix(`/admin`) || PathPrefix(`/uploads`))"
+      - "traefik.http.routers.blog.entrypoints=web"
+      - "traefik.http.routers.blog.priority=5"
+      - "traefik.http.services.blog.loadbalancer.server.port=9033"
+      - "traefik.docker.network=proxy"
+    networks:
+      - proxy
+      - interstack
+
   droparea:
     image: linuxserver/openssh-server
     container_name: droparea
