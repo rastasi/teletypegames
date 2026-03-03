@@ -20,7 +20,7 @@ let error: string | null = null;
 const GRAPHQL_QUERY = `
   {
     pages {
-      list(orderBy: UPDATED, orderByDirection: DESC) {
+      list(orderBy: UPDATED, orderByDirection: DESC, tags: ["howto"]) {
         id
         path
         title
@@ -104,10 +104,10 @@ function timeAgo(dateStr: string): string {
       
       <div class="hero-container">
         <div class="hero-badge">
-          Latest Updates
+          Knowledge Base
         </div>
         <h1 class="hero-title">
-          Wiki <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">News</span>
+          Tech <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">HowTo Center</span>
         </h1>
         <p class="hero-subtitle mb-10">
           The latest documentation, technical guides, and development logs from our knowledge base.
