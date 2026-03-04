@@ -64,7 +64,7 @@
   }
 
   .card-interactive {
-    @apply card-base hover:shadow-xl transition-all duration-300 ease-out hover:-translate-y-1;
+    @apply bg-white rounded-2xl border border-gray-200 p-6 shadow-sm hover:shadow-xl transition-all duration-300 ease-out hover:-translate-y-1;
   }
 
   /* Decorative Background Elements */

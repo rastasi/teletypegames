@@ -118,7 +118,7 @@ try {
       <!-- Navigation Grid -->
       <section class="card-grid">
         <!-- Catalog Section -->
-        <div class="nav-card group">
+        <div class="nav-card group card-interactive">
           <div class="nav-card-icon bg-purple-50 group-hover:bg-purple-100">
             <span class="text-3xl">🎮</span>
           </div>
@@ -130,7 +130,7 @@ try {
         </div>
 
         <!-- Wiki Section -->
-        <div class="nav-card group">
+        <div class="nav-card group card-interactive">
           <div class="nav-card-icon bg-green-50 group-hover:bg-green-100">
             <span class="text-3xl">📚</span>
           </div>
@@ -142,7 +142,7 @@ try {
         </div>
 
         <!-- Git Section -->
-        <div class="nav-card group">
+        <div class="nav-card group card-interactive">
           <div class="nav-card-icon bg-slate-50 group-hover:bg-slate-100">
             <span class="text-3xl">💻</span>
           </div>
@@ -153,6 +153,13 @@ try {
           </a>
         </div>
       </section>
+      <!-- AI Content Notice -->
+      <div class="mb-12 mt-12 bg-white rounded-2xl border border-indigo-100 p-6 shadow-sm flex items-center gap-4">
+        <div class="w-12 h-12 rounded-full bg-indigo-50 flex items-center justify-center text-2xl flex-shrink-0">🤖</div>
+        <div class="flex-grow text-slate-600 text-sm md:text-base italic">
+          <strong>Note:</strong> Our HowTo-s and blog posts are written by AI with human supervision.
+        </div>
+      </div>
     </main>
   </div>
 </Layout>
@@ -192,7 +199,7 @@ try {
 
   /* Nav Cards */
   .nav-card {
-    @apply card-interactive flex flex-col h-full;
+    @apply flex flex-col h-full;
   }
   .nav-card-icon {
     @apply w-14 h-14 rounded-xl flex items-center justify-center mb-6 transition-colors;
