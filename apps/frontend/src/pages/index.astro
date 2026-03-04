@@ -66,10 +66,10 @@ try {
 ---
 
 <Layout>
-  <div class="bg-gray-50 min-h-screen pb-20">
+  <div class="home-container">
     <!-- Header Section -->
     <header class="hero-section-slate">
-      <div class="absolute inset-0 opacity-30">
+      <div class="home-header-decor">
         <div class="hero-decor-blob -top-24 -left-24 h-96 w-96 bg-indigo-600"></div>
         <div class="hero-decor-blob -bottom-24 -right-24 h-96 w-96 bg-purple-600"></div>
       </div>
@@ -91,19 +91,19 @@ try {
       <!-- Countdown Section -->
       {nextEvent && (
         <section class="mb-12">
-          <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 p-8 md:p-12 text-center transition-all duration-300">
-            <h2 class="text-2xl font-bold text-gray-400 uppercase tracking-widest mb-2">{nextEvent.name}</h2>
-            <div id="countdown" data-date={nextEvent.dateISO} class="text-5xl md:text-7xl font-mono font-black text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-fuchsia-600 my-6">
+          <div class="countdown-card">
+            <h2 class="countdown-event-name">{nextEvent.name}</h2>
+            <div id="countdown" data-date={nextEvent.dateISO} class="countdown-timer">
               -- : -- : -- : --
             </div>
-            <p class="text-gray-500 text-lg">Starts on: <span class="font-semibold">{nextEvent.dateText}</span></p>
+            <p class="countdown-date">Starts on: <span class="font-semibold">{nextEvent.dateText}</span></p>
 
             {followingEvents.length > 0 && (
-              <div class="mt-12 pt-12 border-t border-gray-100 text-left max-w-2xl mx-auto">
-                <h3 class="text-xl font-bold text-gray-900 mb-6">Upcoming Events</h3>
+              <div class="upcoming-events-section">
+                <h3 class="upcoming-events-title">Upcoming Events</h3>
                 <div class="space-y-4">
                   {followingEvents.map(event => (
-                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
+                    <div class="upcoming-event-item">
                       <span class="font-bold text-gray-800">{event.name}</span>
                       <span class="text-sm text-gray-500 font-mono">{event.dateText}</span>
                     </div>
@@ -118,36 +118,36 @@ try {
       <!-- Navigation Grid -->
       <section class="card-grid">
         <!-- Catalog Section -->
-        <div class="group card-interactive flex flex-col h-full">
-          <div class="w-14 h-14 bg-purple-50 rounded-xl flex items-center justify-center mb-6 group-hover:bg-purple-100 transition-colors">
+        <div class="nav-card group">
+          <div class="nav-card-icon bg-purple-50 group-hover:bg-purple-100">
             <span class="text-3xl">🎮</span>
           </div>
-          <h2 class="text-2xl font-bold text-gray-900 mb-3">Catalog</h2>
-          <p class="text-gray-600 mb-6 flex-grow leading-relaxed">Here you can find our games. Discover our creations for TIC-80 and other platforms, many of which you can try directly in your browser.</p>
+          <h2 class="nav-card-title">Catalog</h2>
+          <p class="nav-card-desc">Here you can find our games. Discover our creations for TIC-80 and other platforms, many of which you can try directly in your browser.</p>
           <a href="/catalog" class="btn-primary bg-purple-600 hover:bg-purple-700 text-white hover:shadow-purple-200">
             Browse Games
           </a>
         </div>
 
         <!-- Wiki Section -->
-        <div class="group card-interactive flex flex-col h-full">
-          <div class="w-14 h-14 bg-green-50 rounded-xl flex items-center justify-center mb-6 group-hover:bg-green-100 transition-colors">
+        <div class="nav-card group">
+          <div class="nav-card-icon bg-green-50 group-hover:bg-green-100">
             <span class="text-3xl">📚</span>
           </div>
-          <h2 class="text-2xl font-bold text-gray-900 mb-3">Wiki</h2>
-          <p class="text-gray-600 mb-6 flex-grow leading-relaxed">We gather our public interest development knowledge here. Read through technical descriptions and development logs.</p>
+          <h2 class="nav-card-title">Wiki</h2>
+          <p class="nav-card-desc">We gather our public interest development knowledge here. Read through technical descriptions and development logs.</p>
           <a href="https://wiki.teletype.hu" target="_blank" rel="noopener noreferrer" class="btn-primary bg-green-600 hover:bg-green-700 text-white hover:shadow-green-200">
             Knowledge Base
           </a>
         </div>
 
         <!-- Git Section -->
-        <div class="group card-interactive flex flex-col h-full">
-          <div class="w-14 h-14 bg-slate-50 rounded-xl flex items-center justify-center mb-6 group-hover:bg-slate-100 transition-colors">
+        <div class="nav-card group">
+          <div class="nav-card-icon bg-slate-50 group-hover:bg-slate-100">
             <span class="text-3xl">💻</span>
           </div>
-          <h2 class="text-2xl font-bold text-gray-900 mb-3">Git Repos</h2>
-          <p class="text-gray-600 mb-6 flex-grow leading-relaxed">All our projects are open source. Browse our code, study our solutions, or even participate in the development.</p>
+          <h2 class="nav-card-title">Git Repos</h2>
+          <p class="nav-card-desc">All our projects are open source. Browse our code, study our solutions, or even participate in the development.</p>
           <a href="https://git.teletype.hu" target="_blank" rel="noopener noreferrer" class="btn-primary bg-slate-800 hover:bg-slate-900 text-white hover:shadow-slate-200">
             Gitea
           </a>
@@ -156,6 +156,54 @@ try {
     </main>
   </div>
 </Layout>
+
+<style>
+  .home-container {
+    @apply bg-gray-50 min-h-screen pb-20;
+  }
+  .home-header-decor {
+    @apply absolute inset-0 opacity-30;
+  }
+  
+  /* Countdown Card */
+  .countdown-card {
+    @apply bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 p-8 md:p-12 text-center transition-all duration-300;
+  }
+  .countdown-event-name {
+    @apply text-2xl font-bold text-gray-400 uppercase tracking-widest mb-2;
+  }
+  .countdown-timer {
+    @apply text-5xl md:text-7xl font-mono font-black text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-fuchsia-600 my-6;
+  }
+  .countdown-date {
+    @apply text-gray-500 text-lg;
+  }
+  
+  /* Upcoming Events */
+  .upcoming-events-section {
+    @apply mt-12 pt-12 border-t border-gray-100 text-left max-w-2xl mx-auto;
+  }
+  .upcoming-events-title {
+    @apply text-xl font-bold text-gray-900 mb-6;
+  }
+  .upcoming-event-item {
+    @apply flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100;
+  }
+
+  /* Nav Cards */
+  .nav-card {
+    @apply card-interactive flex flex-col h-full;
+  }
+  .nav-card-icon {
+    @apply w-14 h-14 rounded-xl flex items-center justify-center mb-6 transition-colors;
+  }
+  .nav-card-title {
+    @apply text-2xl font-bold text-gray-900 mb-3;
+  }
+  .nav-card-desc {
+    @apply text-gray-600 mb-6 flex-grow leading-relaxed;
+  }
+</style>
 
 <script>
   function updateCountdown() {

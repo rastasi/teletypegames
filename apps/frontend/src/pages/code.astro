@@ -135,7 +135,7 @@ const recentCommits = allCommits.slice(0, 20);
 
   <main class="main-container">
     {error && (
-      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-8" role="alert">
+      <div class="error-alert" role="alert">
         <strong class="font-bold">Error!</strong>
         <span class="block sm:inline"> {error}</span>
       </div>
@@ -145,43 +145,43 @@ const recentCommits = allCommits.slice(0, 20);
       <div class="card-grid mb-16">
         {publicRepos.map((repo) => (
           <div class="card-base">
-            <h3 class="text-xl font-semibold mb-2">
-              <a href={repo.html_url} target="_blank" class="text-blue-600 hover:text-blue-800">
+            <h3 class="repo-card-title">
+              <a href={repo.html_url} target="_blank" class="repo-link">
                 {repo.owner.login}/{repo.name}
               </a>
             </h3>
-            {repo.description && <p class="text-gray-700 text-sm">{repo.description}</p>}
-            {repo.language && <p class="text-gray-500 text-xs mt-1">Language: {repo.language}</p>}
-            <p class="text-gray-500 text-xs mt-1">Updated: {new Date(repo.updated_at).toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric'})}</p>
+            {repo.description && <p class="repo-card-desc">{repo.description}</p>}
+            {repo.language && <p class="repo-card-meta">Language: {repo.language}</p>}
+            <p class="repo-card-meta">Updated: {new Date(repo.updated_at).toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric'})}</p>
           </div>
         ))}
       </div>
     )}
 
-    <h2 class="text-3xl font-bold mb-8 text-center text-gray-800">Recent Commits</h2>
+    <h2 class="commits-section-title">Recent Commits</h2>
 
     {!error && recentCommits.length === 0 && (
-      <p class="text-center text-gray-600 text-lg">No recent commits found or accessible from public repositories.</p>
+      <p class="empty-commits-msg">No recent commits found or accessible from public repositories.</p>
     )}
 
-    <div class="space-y-4 mb-12">
+    <div class="commits-list">
       {recentCommits.map((commit) => (
-        <div class="bg-white shadow-lg rounded-lg p-4 flex items-center space-x-4 border border-gray-100">
-          <div class="flex-shrink-0 text-3xl">
+        <div class="commit-item">
+          <div class="commit-icon">
             🚀
           </div>
-          <div class="flex-grow">
-            <p class="text-gray-800 font-semibold">
-              <a href={commit.repo.html_url} target="_blank" class="text-blue-600 hover:text-blue-800">
+          <div class="commit-content">
+            <p class="commit-message">
+              <a href={commit.repo.html_url} target="_blank" class="commit-repo-link">
                 <span class="font-bold">{commit.repo.owner}</span> / <span class="font-bold">{commit.repo.name}</span>
               </a>
               : <span class="text-gray-700">{commit.message.split('\n')[0]}</span>
             </p>
-            <p class="text-gray-600 text-sm mt-1">
+            <p class="commit-meta">
               Authored by <span class="font-bold">{commit.author.name}</span> on {new Date(commit.date).toLocaleDateString('en-US', {
                 year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
               })}
-              <a href={commit.url} target="_blank" class="ml-2 text-blue-500 hover:text-blue-700">
+              <a href={commit.url} target="_blank" class="commit-sha-link">
                 <span class="font-mono text-xs">{commit.sha.substring(0, 7)}</span>
               </a>
             </p>
@@ -191,3 +191,55 @@ const recentCommits = allCommits.slice(0, 20);
     </div>
   </main>
 </Layout>
+
+<style>
+  .error-alert {
+    @apply bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-8;
+  }
+  
+  /* Repo Cards */
+  .repo-card-title {
+    @apply text-xl font-semibold mb-2;
+  }
+  .repo-link {
+    @apply text-blue-600 hover:text-blue-800;
+  }
+  .repo-card-desc {
+    @apply text-gray-700 text-sm;
+  }
+  .repo-card-meta {
+    @apply text-gray-500 text-xs mt-1;
+  }
+  
+  /* Commits */
+  .commits-section-title {
+    @apply text-3xl font-bold mb-8 text-center text-gray-800;
+  }
+  .empty-commits-msg {
+    @apply text-center text-gray-600 text-lg;
+  }
+  .commits-list {
+    @apply space-y-4 mb-12;
+  }
+  .commit-item {
+    @apply bg-white shadow-lg rounded-lg p-4 flex items-center space-x-4 border border-gray-100;
+  }
+  .commit-icon {
+    @apply flex-shrink-0 text-3xl;
+  }
+  .commit-content {
+    @apply flex-grow;
+  }
+  .commit-message {
+    @apply text-gray-800 font-semibold;
+  }
+  .commit-repo-link {
+    @apply text-blue-600 hover:text-blue-800;
+  }
+  .commit-meta {
+    @apply text-gray-600 text-sm mt-1;
+  }
+  .commit-sha-link {
+    @apply ml-2 text-blue-500 hover:text-blue-700;
+  }
+</style>

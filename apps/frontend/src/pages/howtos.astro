@@ -94,10 +94,10 @@ function timeAgo(dateStr: string): string {
 ---
 
 <Layout>
-  <div class="bg-gray-50 min-h-screen pb-20">
+  <div class="howtos-container">
     <header class="hero-section-slate">
       <!-- Decorative background elements -->
-      <div class="absolute inset-0 opacity-30">
+      <div class="howtos-header-decor">
         <div class="hero-decor-blob -top-24 -left-24 h-96 w-96 bg-indigo-600"></div>
         <div class="hero-decor-blob -bottom-24 -right-24 h-96 w-96 bg-purple-600"></div>
       </div>
@@ -125,20 +125,20 @@ function timeAgo(dateStr: string): string {
     <main class="main-container">
 
       {error && (
-        <div class="bg-red-50 border-l-4 border-red-500 p-6 rounded-r-xl shadow-lg mb-12 flex items-start gap-4" role="alert">
+        <div class="error-banner" role="alert">
           <span class="text-2xl">⚠️</span>
           <div>
-            <h3 class="text-red-800 font-bold text-lg">Failed to connect to Wiki</h3>
-            <p class="text-red-700 mt-1">{error}</p>
+            <h3 class="error-banner-title">Failed to connect to Wiki</h3>
+            <p class="error-banner-desc">{error}</p>
           </div>
         </div>
       )}
 
       {!error && recentPages.length === 0 && (
-        <div class="bg-white rounded-2xl shadow-xl p-12 text-center border border-gray-100">
-          <div class="text-6xl mb-4">📭</div>
-          <h2 class="text-2xl font-bold text-gray-900 mb-2">No pages found</h2>
-          <p class="text-gray-500 max-w-md mx-auto">It seems like there aren't any public pages available on the wiki at the moment.</p>
+        <div class="empty-state">
+          <div class="empty-state-icon">📭</div>
+          <h2 class="empty-state-title">No pages found</h2>
+          <p class="empty-state-desc">It seems like there aren't any public pages available on the wiki at the moment.</p>
         </div>
       )}
 
@@ -154,11 +154,11 @@ function timeAgo(dateStr: string): string {
                 target="_blank"
                 class="group card-interactive flex flex-col"
               >
-                <div class="flex items-center justify-end mb-4">
-                  <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
+                <div class="howto-card-meta">
+                  <div class="howto-card-timestamp">
                     {isNew && (
-                      <span class="flex items-center gap-1 text-green-600 bg-green-50 px-2 py-0.5 rounded-full border border-green-100">
-                        <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                      <span class="new-badge">
+                        <span class="new-dot"></span>
                         New
                       </span>
                     )}
@@ -166,23 +166,23 @@ function timeAgo(dateStr: string): string {
                   </div>
                 </div>
 
-                <h2 class="text-xl font-bold text-gray-900 group-hover:text-indigo-600 transition-colors mb-2 line-clamp-2 leading-tight">
+                <h2 class="howto-card-title">
                   {page.title}
                 </h2>
                 
                 {page.description ? (
-                  <p class="text-gray-600 text-sm mb-4 line-clamp-3 leading-relaxed flex-grow">
+                  <p class="howto-card-desc">
                     {page.description}
                   </p>
                 ) : (
-                  <div class="flex-grow mb-4 italic text-gray-400 text-sm">No description provided.</div>
+                  <div class="howto-card-no-desc">No description provided.</div>
                 )}
 
-                <div class="pt-4 border-t border-gray-100 mt-auto flex items-center justify-between">
-                  <span class="text-xs font-mono text-gray-400 truncate max-w-[180px]">
+                <div class="howto-card-footer">
+                  <span class="howto-card-path">
                     {page.path}
                   </span>
-                  <span class="text-indigo-600 text-sm font-bold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                  <span class="howto-card-read-link">
                     Read <span class="text-lg">→</span>
                   </span>
                 </div>
@@ -193,11 +193,11 @@ function timeAgo(dateStr: string): string {
       )}
 
       {!error && recentPages.length > 0 && (
-        <div class="mt-16 text-center">
+        <div class="howtos-footer">
           <a
             href={WIKIJS_BASE_URL}
             target="_blank"
-            class="inline-flex items-center gap-2 bg-slate-900 text-white px-8 py-4 rounded-xl hover:bg-slate-800 transition-all font-bold shadow-lg hover:shadow-indigo-200/50"
+            class="browse-wiki-btn"
           >
             Browse Wiki Home
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -209,3 +209,67 @@ function timeAgo(dateStr: string): string {
     </main>
   </div>
 </Layout>
+
+<style>
+  .howtos-container {
+    @apply bg-gray-50 min-h-screen pb-20;
+  }
+  .howtos-header-decor {
+    @apply absolute inset-0 opacity-30;
+  }
+  
+  /* Banners */
+  .banner-base {
+    @apply max-w-7xl mx-auto border-l-4 p-6 rounded-r-xl shadow-lg mb-12 flex items-start gap-4;
+  }
+  .error-banner { @apply banner-base bg-red-50 border-red-500; }
+  .error-banner-title { @apply text-red-800 font-bold text-lg; }
+  .error-banner-desc { @apply text-red-700 mt-1; }
+  
+  /* Empty State */
+  .empty-state {
+    @apply max-w-7xl mx-auto bg-white rounded-2xl shadow-xl p-12 text-center border border-gray-100;
+  }
+  .empty-state-icon { @apply text-6xl mb-4; }
+  .empty-state-title { @apply text-2xl font-bold text-gray-900 mb-2; }
+  .empty-state-desc { @apply text-gray-500 max-w-md mx-auto; }
+
+  /* Cards */
+  .howto-card-meta {
+    @apply flex items-center justify-end mb-4;
+  }
+  .howto-card-timestamp {
+    @apply flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-gray-400;
+  }
+  .new-badge {
+    @apply flex items-center gap-1 text-green-600 bg-green-50 px-2 py-0.5 rounded-full border border-green-100;
+  }
+  .new-dot {
+    @apply w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse;
+  }
+  .howto-card-title {
+    @apply text-xl font-bold text-gray-900 group-hover:text-indigo-600 transition-colors mb-2 line-clamp-2 leading-tight;
+  }
+  .howto-card-desc {
+    @apply text-gray-600 text-sm mb-4 line-clamp-3 leading-relaxed flex-grow;
+  }
+  .howto-card-no-desc {
+    @apply flex-grow mb-4 italic text-gray-400 text-sm;
+  }
+  .howto-card-footer {
+    @apply pt-4 border-t border-gray-100 mt-auto flex items-center justify-between;
+  }
+  .howto-card-path {
+    @apply text-xs font-mono text-gray-400 truncate max-w-[180px];
+  }
+  .howto-card-read-link {
+    @apply text-indigo-600 text-sm font-bold flex items-center gap-1 group-hover:translate-x-1 transition-transform;
+  }
+
+  .howtos-footer {
+    @apply mt-16 text-center;
+  }
+  .browse-wiki-btn {
+    @apply inline-flex items-center gap-2 bg-slate-900 text-white px-8 py-4 rounded-xl hover:bg-slate-800 transition-all font-bold shadow-lg hover:shadow-indigo-200/50;
+  }
+</style>
