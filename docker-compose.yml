@@ -120,6 +120,7 @@ services:
       - HOST=0.0.0.0
       - WEBAPP_GITEA_TOKEN=${WEBAPP_GITEA_TOKEN}
       - WEBAPP_WIKIJS_TOKEN=${WEBAPP_WIKIJS_TOKEN}
+      - DISCORD_INVITE_LINK=${DISCORD_INVITE_LINK}
     volumes:
       - ./apps/frontend:/app
       - /app/node_modules
