@@ -209,9 +209,6 @@ function timeAgo(dateStr: string): string {
                         <span>{timeAgo(page.updatedAt)}</span>
                       </div>
                     </div>
-                    <a href={pageUrl} target="_blank" class="text-indigo-600 hover:text-indigo-800 font-bold flex items-center gap-2 transition-colors">
-                      View on Wiki <span>→</span>
-                    </a>
                   </div>
 
                   <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-8 leading-tight">
@@ -222,7 +219,7 @@ function timeAgo(dateStr: string): string {
                     <div class="wiki-content prose prose-lg max-w-none text-gray-700 leading-relaxed" set:html={page.render} />
                   ) : (
                     <div class="text-gray-600 text-lg leading-relaxed whitespace-pre-wrap">
-                      {page.description || "No preview available. Click 'View on Wiki' to read the full post."}
+                      {page.description || "No preview available for this post."}
                     </div>
                   )}
                 </div>
