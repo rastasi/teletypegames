@@ -33,9 +33,23 @@ const DISCORD_INVITE_LINK = import.meta.env.DISCORD_INVITE_LINK || "https://disc
         <p class="text-gray-600 mb-6 leading-relaxed">
           For business inquiries, support, or detailed feedback, feel free to drop us an email.
         </p>
-        <a href="mailto:contact@teletype.hu" class="text-indigo-600 font-bold text-xl hover:underline transition-all">
-          contact@teletype.hu
-        </a>
+        <div id="email-container" class="text-indigo-600 font-bold text-xl hover:underline cursor-pointer transition-all">
+          <span class="opacity-50 text-sm font-normal italic">Loading email...</span>
+        </div>
+
+        <script is:inline>
+          // Simple obfuscation to thwart basic scrapers
+          const user = 'contact';
+          const domain = 'teletype.hu';
+          const element = document.getElementById('email-container');
+          
+          if (element) {
+            element.innerHTML = `${user}@${domain}`;
+            element.addEventListener('click', () => {
+              window.location.href = `mailto:${user}@${domain}`;
+            });
+          }
+        </script>
       </div>
 
       <div class="bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
