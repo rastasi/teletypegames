@@ -34,7 +34,7 @@ try {
   const LIST_QUERY = `
     {
       pages {
-        list(orderBy: UPDATED, orderByDirection: DESC, tags: ["blog"]) {
+        list(orderBy: CREATED, orderByDirection: DESC, tags: ["blog"]) {
           id
           path
           title
@@ -195,7 +195,7 @@ function getCleanPreview(content: string): string {
                             New Post
                           </span>
                         )}
-                        <span>{timeAgo(page.updatedAt)}</span>
+                        <span>{timeAgo(page.createdAt)}</span>
                       </div>
                     </div>
                   </div>
