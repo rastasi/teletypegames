@@ -9,6 +9,7 @@ interface WikiPage {
   path: string;
   title: string;
   description: string;
+  content: string;
   render?: string;
   updatedAt: string;
   createdAt: string;
@@ -59,11 +60,43 @@ try {
   }
   
   const pages = listJson?.data?.pages?.list ?? [];
-  blogPages = pages.map((p: any) => ({
+
+  // 2. Fetch content for each page (WikiJS list doesn't include content)
+  // To keep it efficient, we only fetch the first few blog posts' content if needed, 
+  // or we can fetch all if the list is short.
+  const pagesWithContent = await Promise.all(pages.map(async (p: any) => {
+    try {
+      const CONTENT_QUERY = `
+        {
+          pages {
+            single(id: ${p.id}) {
+              content
+            }
+          }
+        }
+      `;
+      const contentRes = await fetch(`${WIKIJS_BASE_URL}/graphql`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ query: CONTENT_QUERY }),
+      });
+      const contentJson = await contentRes.json();
+      return {
+        ...p,
+        content: contentJson?.data?.pages?.single?.content ?? ''
+      };
+    } catch (e) {
+      console.error(`Failed to fetch content for page ${p.id}`, e);
+      return { ...p, content: '' };
+    }
+  }));
+
+  blogPages = pagesWithContent.map((p: any) => ({
     id: p.id,
     path: p.path,
     title: p.title || p.path,
     description: p.description ?? '',
+    content: p.content ?? '',
     updatedAt: p.updatedAt,
     createdAt: p.createdAt,
     locale: p.locale,
@@ -92,6 +125,14 @@ function timeAgo(dateStr: string): string {
 function getPermalink(path: string): string {
   const slug = path.startsWith('blog/') ? path.replace('blog/', '') : path;
   return `/blog/${slug}`;
+}
+
+function getCleanPreview(content: string): string {
+  if (!content) return '';
+  return content
+    .replace(/[#*`_\[\]()]/g, '')
+    .trim()
+    .slice(0, 300) + '...';
 }
 ---
 
@@ -165,11 +206,19 @@ function getPermalink(path: string): string {
                     </a>
                   </h2>
                   
-                  {page.description && (
-                    <p class="blog-post-description">
-                      {page.description}
-                    </p>
-                  )}
+                  <div class="blog-post-preview">
+                    {page.description && (
+                      <p class="blog-post-description">
+                        {page.description}
+                      </p>
+                    )}
+                    
+                    {page.content && (
+                      <p class="blog-post-body">
+                        {getCleanPreview(page.content)}
+                      </p>
+                    )}
+                  </div>
                   
                   <div class="mt-6">
                     <a href={permalink} class="read-more-btn">
@@ -244,8 +293,23 @@ function getPermalink(path: string): string {
   .blog-post-title {
     @apply text-2xl md:text-3xl font-black text-gray-900 mb-4 leading-tight;
   }
+  
+  .blog-post-preview {
+    @apply relative overflow-hidden;
+    max-height: 8rem; /* kb 4-5 sor */
+  }
+
+  .blog-post-preview::after {
+    content: "";
+    @apply absolute bottom-0 left-0 w-full h-16 bg-gradient-to-b from-transparent to-white pointer-events-none;
+  }
+
   .blog-post-description {
-    @apply text-lg text-gray-500 mb-2 font-medium leading-relaxed;
+    @apply text-lg text-gray-800 font-bold mb-2 leading-relaxed;
+  }
+
+  .blog-post-body {
+    @apply text-base text-gray-500 font-medium leading-relaxed;
   }
   
   .read-more-btn {
