@@ -17,7 +17,7 @@ export async function getStaticPaths() {
   const LIST_QUERY = `
     {
       pages {
-        list(orderBy: UPDATED, orderByDirection: DESC, tags: ["blog"]) {
+        list(orderBy: CREATED, orderByDirection: DESC, tags: ["blog"]) {
           id
           path
           title
@@ -147,7 +147,7 @@ function timeAgo(dateStr: string): string {
               {pageContent.description}
             </p>
             <div class="blog-post-timestamp text-indigo-200">
-              {timeAgo(pageContent.updatedAt)}
+              {timeAgo(pageContent.createdAt)}
             </div>
           </>
         )}
