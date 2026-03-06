@@ -69,53 +69,6 @@ try {
     locale: p.locale,
   }));
 
-  // 2. Try to fetch rendered HTML for each page
-  const idsToFetch = blogPages.slice(0, 10).map(p => p.id);
-  
-  if (idsToFetch.length > 0) {
-    const SINGLE_PAGES_QUERY = `
-      {
-        ${idsToFetch.map((id: number, index: number) => `
-          page_${index}: pages {
-            single(id: ${id}) {
-              id
-              render
-            }
-          }
-        `).join('\n')}
-      }
-    `;
-
-    const contentResponse = await fetch(`${WIKIJS_BASE_URL}/graphql`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({ query: SINGLE_PAGES_QUERY }),
-    });
-
-    const contentJson = await contentResponse.json();
-    
-    if (contentJson.errors) {
-      if (contentJson.errors.some((e: any) => e.message.includes('authorized') || e.message.includes('permission'))) {
-        console.warn('WikiJS: Permission denied for pages.single. Falling back to descriptions.');
-        permissionWarning = true;
-      } else {
-        console.error('WikiJS Content Error:', contentJson.errors);
-      }
-    }
-
-    // Merge rendered HTML if available
-    if (contentJson.data) {
-      Object.values(contentJson.data).forEach((item: any) => {
-        if (item?.single) {
-          const match = blogPages.find(p => p.id === item.single.id);
-          if (match) {
-            match.render = item.single.render;
-          }
-        }
-      });
-    }
-  }
-
 } catch (e: any) {
   console.error('Failed to fetch WikiJS data:', e);
   error = `Failed to fetch wiki data: ${e.message}`;
@@ -134,6 +87,11 @@ function timeAgo(dateStr: string): string {
   if (diffHours < 24) return `${diffHours}h ago`;
   if (diffDays < 30) return `${diffDays}d ago`;
   return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+}
+
+function getPermalink(path: string): string {
+  const slug = path.startsWith('blog/') ? path.replace('blog/', '') : path;
+  return `/blog/${slug}`;
 }
 ---
 
@@ -170,16 +128,6 @@ function timeAgo(dateStr: string): string {
         </div>
       )}
 
-      {permissionWarning && (
-        <div class="warning-banner" role="alert">
-          <span class="text-2xl">ℹ️</span>
-          <div>
-            <h3 class="warning-banner-title">Limited Access</h3>
-            <p class="warning-banner-desc">Full content is hidden because the API token lacks <code>manage:pages</code> or <code>delete:pages</code> permissions in Wiki.js. Showing summaries instead.</p>
-          </div>
-        </div>
-      )}
-
       {!error && blogPages.length === 0 && (
         <div class="empty-state">
           <div class="empty-state-icon">📭</div>
@@ -192,6 +140,7 @@ function timeAgo(dateStr: string): string {
         <div class="blog-posts-list">
           {blogPages.map((page) => {
             const isNew = (new Date().getTime() - new Date(page.createdAt).getTime()) < 7 * 24 * 60 * 60 * 1000;
+            const permalink = getPermalink(page.path);
 
             return (
               <article class="blog-post-card">
@@ -211,7 +160,9 @@ function timeAgo(dateStr: string): string {
                   </div>
 
                   <h2 class="blog-post-title">
-                    {page.title}
+                    <a href={permalink} class="hover:text-indigo-600 transition-colors">
+                      {page.title}
+                    </a>
                   </h2>
                   
                   {page.description && (
@@ -220,15 +171,14 @@ function timeAgo(dateStr: string): string {
                     </p>
                   )}
                   
-                  {page.render ? (
-                    <div class="wiki-content max-w-none text-gray-700 leading-relaxed" set:html={page.render} />
-                  ) : (
-                    !page.description && (
-                      <div class="blog-post-fallback">
-                        No preview available for this post.
-                      </div>
-                    )
-                  )}
+                  <div class="mt-6">
+                    <a href={permalink} class="read-more-btn">
+                      Read more
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                      </svg>
+                    </a>
+                  </div>
                 </div>
               </article>
             );
@@ -250,7 +200,7 @@ function timeAgo(dateStr: string): string {
     @apply absolute inset-0 opacity-30;
   }
   .blog-main {
-    @apply w-full px-4 md:px-8 -mt-12 relative z-10;
+    @apply max-w-5xl mx-auto px-4 md:px-8 -mt-12 relative z-10;
   }
   
   /* Banners */
@@ -261,10 +211,6 @@ function timeAgo(dateStr: string): string {
   .error-banner-title { @apply text-red-800 font-bold text-lg; }
   .error-banner-desc { @apply text-red-700 mt-1; }
   
-  .warning-banner { @apply banner-base bg-amber-50 border-amber-500; }
-  .warning-banner-title { @apply text-amber-800 font-bold text-lg; }
-  .warning-banner-desc { @apply text-amber-700 mt-1; }
-
   /* Empty State */
   .empty-state {
     @apply max-w-7xl mx-auto bg-white rounded-2xl shadow-xl p-12 text-center border border-gray-100;
@@ -299,10 +245,11 @@ function timeAgo(dateStr: string): string {
     @apply text-2xl md:text-3xl font-black text-gray-900 mb-4 leading-tight;
   }
   .blog-post-description {
-    @apply text-lg text-gray-500 mb-8 font-medium leading-relaxed;
+    @apply text-lg text-gray-500 mb-2 font-medium leading-relaxed;
   }
-  .blog-post-fallback {
-    @apply text-gray-600 text-base leading-relaxed whitespace-pre-wrap;
+  
+  .read-more-btn {
+    @apply inline-flex items-center text-indigo-600 font-bold hover:text-indigo-800 transition-colors;
   }
 </style>
 

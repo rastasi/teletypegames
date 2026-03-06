@@ -1,0 +1,244 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+export async function getStaticPaths() {
+  const WIKIJS_BASE_URL = 'https://wiki.teletype.hu';
+  const WIKIJS_TOKEN = import.meta.env.WEBAPP_WIKIJS_TOKEN;
+
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  };
+
+  if (WIKIJS_TOKEN) {
+    headers['Authorization'] = `Bearer ${WIKIJS_TOKEN}`;
+  }
+
+  const LIST_QUERY = `
+    {
+      pages {
+        list(orderBy: UPDATED, orderByDirection: DESC, tags: ["blog"]) {
+          id
+          path
+          title
+          description
+          updatedAt
+          createdAt
+          locale
+        }
+      }
+    }
+  `;
+
+  try {
+    const listResponse = await fetch(`${WIKIJS_BASE_URL}/graphql`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ query: LIST_QUERY }),
+    });
+
+    const listJson = await listResponse.json();
+    const pages = listJson?.data?.pages?.list ?? [];
+
+    return pages.map((page: any) => {
+      // WikiJS paths usually look like "blog/my-post"
+      // We want to match it against /blog/[...slug]
+      // If path is "blog/post-1", slug should be "post-1"
+      const slug = page.path.startsWith('blog/') 
+        ? page.path.replace('blog/', '') 
+        : page.path;
+
+      return {
+        params: { slug },
+        props: { pageId: page.id },
+      };
+    });
+  } catch (e) {
+    console.error('Error fetching paths for blog posts:', e);
+    return [];
+  }
+}
+
+const { slug } = Astro.params;
+const { pageId } = Astro.props;
+
+const WIKIJS_BASE_URL = 'https://wiki.teletype.hu';
+const WIKIJS_TOKEN = import.meta.env.WEBAPP_WIKIJS_TOKEN;
+
+let pageContent = null;
+let error = null;
+
+try {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  };
+
+  if (WIKIJS_TOKEN) {
+    headers['Authorization'] = `Bearer ${WIKIJS_TOKEN}`;
+  }
+
+  const SINGLE_PAGE_QUERY = `
+    {
+      pages {
+        single(id: ${pageId}) {
+          id
+          path
+          title
+          description
+          render
+          updatedAt
+          createdAt
+        }
+      }
+    }
+  `;
+
+  const response = await fetch(`${WIKIJS_BASE_URL}/graphql`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ query: SINGLE_PAGE_QUERY }),
+  });
+
+  const json = await response.json();
+  pageContent = json?.data?.pages?.single;
+  
+  if (!pageContent) {
+    error = "Post not found";
+  }
+} catch (e: any) {
+  error = e.message;
+}
+
+function timeAgo(dateStr: string): string {
+  const now = new Date();
+  const date = new Date(dateStr);
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMins / 60);
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffMins < 1) return 'just now';
+  if (diffMins < 60) return `${diffMins}m ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffDays < 30) return `${diffDays}d ago`;
+  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+}
+---
+
+<Layout>
+  <div class="blog-container">
+    <header class="blog-header">
+      <div class="blog-header-decor">
+        <div class="hero-decor-blob -top-24 -left-24 h-96 w-96 bg-purple-600"></div>
+        <div class="hero-decor-blob -bottom-24 -right-24 h-96 w-96 bg-blue-600"></div>
+      </div>
+      
+      <div class="hero-container">
+        <a href="/blog" class="back-link">
+          ← Back to Blog
+        </a>
+        {pageContent && (
+          <>
+            <h1 class="hero-title mt-4">
+              {pageContent.title}
+            </h1>
+            <p class="hero-subtitle mb-4">
+              {pageContent.description}
+            </p>
+            <div class="blog-post-timestamp text-indigo-200">
+              {timeAgo(pageContent.updatedAt)}
+            </div>
+          </>
+        )}
+      </div>
+    </header>
+
+    <main class="blog-main">
+      {error && (
+        <div class="error-banner" role="alert">
+          <span class="text-2xl">⚠️</span>
+          <div>
+            <h3 class="error-banner-title">Error</h3>
+            <p class="error-banner-desc">{error}</p>
+          </div>
+        </div>
+      )}
+
+      {pageContent && (
+        <article class="blog-post-card">
+          <div class="blog-post-content">
+            {pageContent.render ? (
+              <div class="wiki-content max-w-none text-gray-700 leading-relaxed" set:html={pageContent.render} />
+            ) : (
+              <div class="blog-post-fallback">
+                No content available for this post.
+              </div>
+            )}
+          </div>
+        </article>
+      )}
+    </main>
+  </div>
+</Layout>
+
+<style>
+  .blog-container {
+    @apply bg-gray-50 min-h-screen pb-20;
+  }
+  .blog-header {
+    @apply relative overflow-hidden py-24 text-white text-center bg-indigo-900;
+  }
+  .blog-header-decor {
+    @apply absolute inset-0 opacity-30;
+  }
+  .hero-container {
+    @apply relative z-10 max-w-4xl mx-auto px-4;
+  }
+  .back-link {
+    @apply inline-block text-indigo-300 hover:text-white transition-colors font-medium;
+  }
+  .hero-title {
+    @apply text-4xl md:text-5xl font-black mb-4 leading-tight;
+  }
+  .hero-subtitle {
+    @apply text-xl text-indigo-100 font-medium;
+  }
+  .blog-main {
+    @apply max-w-4xl mx-auto px-4 md:px-8 -mt-12 relative z-10;
+  }
+  
+  .blog-post-card {
+    @apply bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden;
+  }
+  .blog-post-content {
+    @apply p-6 md:p-12;
+  }
+  .blog-post-timestamp {
+    @apply text-sm font-semibold uppercase tracking-wider;
+  }
+
+  .error-banner {
+    @apply max-w-7xl mx-auto bg-red-50 border-l-4 border-red-500 p-6 rounded-r-xl shadow-lg mb-12 flex items-start gap-4;
+  }
+  .error-banner-title { @apply text-red-800 font-bold text-lg; }
+  .error-banner-desc { @apply text-red-700 mt-1; }
+</style>
+
+<style is:global>
+  .wiki-content h1 { @apply text-2xl font-bold mt-8 mb-4 text-gray-900; }
+  .wiki-content h2 { @apply text-xl font-bold mt-6 mb-3 text-gray-800; }
+  .wiki-content h3 { @apply text-lg font-bold mt-4 mb-2 text-gray-800; }
+  .wiki-content p { @apply mb-4 text-gray-700 leading-relaxed; }
+  .wiki-content ul { @apply list-disc ml-6 mb-4 text-gray-700; }
+  .wiki-content ol { @apply list-decimal ml-6 mb-4 text-gray-700; }
+  .wiki-content li { @apply mb-1; }
+  .wiki-content a { @apply text-indigo-600 hover:underline; }
+  .wiki-content img { @apply max-w-full h-auto rounded-lg my-6 shadow-md; }
+  .wiki-content pre { @apply bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto my-6 font-mono text-sm; }
+  .wiki-content code { @apply bg-gray-100 text-pink-600 px-1 rounded font-mono text-sm; }
+  .wiki-content blockquote { @apply border-l-4 border-gray-300 pl-4 italic my-6 text-gray-600; }
+  .wiki-content table { @apply w-full border-collapse my-6; }
+  .wiki-content th, .wiki-content td { @apply border border-gray-200 p-3 text-left; }
+  .wiki-content th { @apply bg-gray-50 font-bold; }
+</style>
