@@ -6,11 +6,24 @@ type SoftwareRepositoryInterface interface {
 	List() ([]Software, error)
 	GetByName(name string) (*Software, error)
 	UpdateOrCreate(software *Software) error
+	GetHighlighted() (*Software, error)
 }
 
 type SoftwareRepository struct {
 	db *gorm.DB
 }
+
+func (r *SoftwareRepository) GetHighlighted() (*Software, error) {
+	var software Software
+	if err := r.db.Preload("Releases").Where("highlighted = 1").Order("id DESC").First(&software).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &software, nil
+}
+
 
 func (r *SoftwareRepository) GetByName(name string) (*Software, error) {
 	var software Software

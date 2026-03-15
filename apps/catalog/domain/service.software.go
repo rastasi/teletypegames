@@ -27,11 +27,24 @@ type SoftwareServiceInterface interface {
 	GetByName(name string) (*Software, error)
 	GetLatestRelease(software_id string) (*Release, error)
 	GetForShowByName(name string) (*SoftwareShowData, error)
+	GetHighlighted() (*SoftwareShowData, error)
 }
 
 type SoftwareService struct {
 	softeare_repository SoftwareRepositoryInterface
 	release_repository  ReleaseRepositoryInterface
+}
+
+func (s *SoftwareService) GetHighlighted() (*SoftwareShowData, error) {
+	software, err := s.softeare_repository.GetHighlighted()
+	if err != nil {
+		return nil, err
+	}
+	if software == nil {
+		return nil, nil
+	}
+
+	return s.GetForShowByName(software.Name)
 }
 
 func NewSoftwareService(

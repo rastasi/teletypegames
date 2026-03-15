@@ -24,6 +24,7 @@ func replaceReleasePaths(release *domain.Release) {
 }
 
 func (c *APISoftwareController) Index(w http.ResponseWriter, r *http.Request) {
+
 	softwares, _ := c.softwareService.DetailedList()
 
 	for idx := range softwares.Softwares {

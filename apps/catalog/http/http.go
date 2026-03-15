@@ -8,6 +8,7 @@ import (
 func StartHttpServer(domain_instance domain.Domain) {
 	router := NewRouter(
 		NewAPISoftwareController(domain_instance.SoftwareService),
+		NewAPISoftwareHighlightedController(domain_instance.SoftwareService),
 		NewSoftwareUpdaterController(domain_instance.SoftwareUpdaterService, domain_instance.SoftwareService),
 	).Init()
 

@@ -11,6 +11,7 @@ type Software struct {
 	Site     string    `gorm:"size:255" json:"site"`
 	License  string    `gorm:"size:128" json:"license"`
 	Platform string    `gorm:"size:128" json:"platform"`
-	Status   string    `gorm:"size:20;default:development" json:"status"`
-	Releases []Release `json:"-"`
+	Status      string    `gorm:"size:20;default:development" json:"status"`
+	Highlighted bool      `gorm:"default:false" json:"highlighted"`
+	Releases    []Release `json:"-"`
 }
