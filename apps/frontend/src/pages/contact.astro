@@ -60,17 +60,25 @@ const DISCORD_INVITE_LINK = import.meta.env.DISCORD_INVITE_LINK || "https://disc
           Join our primarily Hungarian-speaking community (English speakers are also welcome!).
         </p>
         
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 justify-center">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 justify-center">
           <div class="community-section border-[#5865F2]">
-            <h3 class="community-section-title">Discord</h3>
+            <h3 class="community-section-title text-[#5865F2]">Discord</h3>
             <p class="community-section-desc">We have a vibrant Discord server for real-time chat and support.</p>
             <a href={DISCORD_INVITE_LINK} target="_blank" class="community-link-discord">
               Join Discord Server <span>→</span>
             </a>
           </div>
 
+          <div class="community-section border-red-600">
+            <h3 class="community-section-title text-red-600">YouTube</h3>
+            <p class="community-section-desc">Watch our latest vlogs and development videos on our channel.</p>
+            <a href="https://www.youtube.com/@teletypegames" target="_blank" class="community-link-youtube">
+              Visit Channel <span>→</span>
+            </a>
+          </div>
+
           <div class="community-section border-green-500">
-            <h3 class="community-section-title">IRC</h3>
+            <h3 class="community-section-title text-green-700">IRC</h3>
             <p class="text-sm text-gray-600 mb-3">If Discord is too modern, find us on IRC!</p>
             <div class="irc-box">
               <span class="irc-network">Network: Libera.Chat</span>
@@ -79,7 +87,7 @@ const DISCORD_INVITE_LINK = import.meta.env.DISCORD_INVITE_LINK || "https://disc
           </div>
 
           <div class="community-section border-amber-500">
-            <h3 class="community-section-title">BBS</h3>
+            <h3 class="community-section-title text-amber-700">BBS</h3>
             <p class="community-section-desc">Join us for some retro vibes on our BBS!</p>
             <div class="bbs-box">
               <span class="bbs-host">Host: games.teletype.hu</span>
@@ -122,6 +130,9 @@ const DISCORD_INVITE_LINK = import.meta.env.DISCORD_INVITE_LINK || "https://disc
   }
   .community-link-discord {
     @apply text-[#5865F2] font-bold hover:underline inline-flex items-center gap-1;
+  }
+  .community-link-youtube {
+    @apply text-red-600 font-bold hover:underline inline-flex items-center gap-1;
   }
   .irc-box {
     @apply bg-green-100 p-4 rounded-xl border border-green-200 mt-3 inline-block;
