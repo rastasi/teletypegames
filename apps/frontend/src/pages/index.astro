@@ -77,6 +77,10 @@ try {
 } catch (e) {
   console.error('Failed to fetch highlighted software:', e);
 }
+
+// YouTube Config from Env
+const YOUTUBE_API_KEY = import.meta.env.YOUTUBE_API_KEY;
+const YOUTUBE_CHANNEL_ID = import.meta.env.YOUTUBE_CHANNEL_ID;
 ---
 
 <Layout>
@@ -162,6 +166,43 @@ try {
           </div>
         </section>
       )}
+
+      <!-- Latest YouTube Video -->
+      <section class="mb-16">
+        <div 
+          class="youtube-widget-container" 
+          id="youtubeWidget" 
+          data-api-key={YOUTUBE_API_KEY} 
+          data-channel-id={YOUTUBE_CHANNEL_ID}
+        >
+          <div class="widget-header">
+            <div class="yt-icon"></div>
+            <span class="widget-label">Latest Video</span>
+            <div class="live-dot" title="Automatically updates"></div>
+          </div>
+
+          <div class="yt-card">
+            <div class="player-wrap" id="playerWrap">
+              <div class="state-overlay" id="stateOverlay">
+                <div class="spinner"></div>
+                <div class="state-text">Loading video...</div>
+              </div>
+            </div>
+
+            <div class="meta" id="metaBox" style="display:none;">
+              <div class="video-title" id="videoTitle">–</div>
+              <div class="meta-row">
+                <span class="meta-chip" id="publishDate">📅 –</span>
+                <span class="meta-chip" id="viewCount">👁 –</span>
+                <span class="new-badge">New</span>
+                <a class="yt-link" id="ytLink" href="#" target="_blank" rel="noopener">
+                  Watch on YouTube ↗
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <!-- Navigation Grid -->
       <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -359,6 +400,80 @@ try {
   .nav-card-desc {
     @apply text-gray-600 mb-6 flex-grow leading-relaxed;
   }
+
+  /* YouTube Widget */
+  .youtube-widget-container {
+    --yt-accent: #ff0000;
+    --bg-card: #181818;
+    --bg-meta: #1f1f1f;
+    --text-primary: #f1f1f1;
+    --text-secondary: #aaaaaa;
+    --border: rgba(255,255,255,0.08);
+    --radius: 12px;
+    @apply w-full max-w-4xl mx-auto;
+  }
+
+  .youtube-widget-container .widget-header {
+    @apply flex items-center gap-2.5 mb-5;
+  }
+  .youtube-widget-container .yt-icon {
+    @apply w-7 h-5 bg-[#ff0000] rounded-[5px] flex items-center justify-center flex-shrink-0;
+  }
+  .youtube-widget-container .yt-icon::after {
+    content: '';
+    @apply border-l-[10px] border-l-white border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent ml-0.5;
+  }
+  .youtube-widget-container .widget-label {
+    @apply text-[11px] font-semibold tracking-[0.12em] uppercase text-gray-500;
+  }
+  .youtube-widget-container .live-dot {
+    @apply w-[7px] h-[7px] rounded-full bg-[#ff0000] ml-auto animate-pulse;
+  }
+
+  .youtube-widget-container .yt-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    @apply overflow-hidden shadow-xl;
+  }
+
+  .youtube-widget-container .player-wrap {
+    @apply relative w-full aspect-video bg-black;
+  }
+  .youtube-widget-container .player-wrap :global(iframe) {
+    @apply w-full h-full border-none block;
+  }
+
+  .youtube-widget-container .state-overlay {
+    @apply absolute inset-0 flex flex-col items-center justify-center gap-4 bg-black;
+  }
+  .youtube-widget-container .state-overlay :global(.spinner) {
+    @apply w-9 h-9 border-4 border-white/10 border-t-[#ff0000] rounded-full animate-spin;
+  }
+  .youtube-widget-container .state-text {
+    @apply text-[13px] text-[#aaaaaa] text-center px-6;
+  }
+
+  .youtube-widget-container .meta {
+    padding: 1.1rem 1.25rem;
+    background: var(--bg-meta);
+    border-top: 1px solid var(--border);
+  }
+  .youtube-widget-container .video-title {
+    @apply text-[15px] font-semibold leading-[1.4] text-[#f1f1f1] mb-1.5 truncate;
+  }
+  .youtube-widget-container .meta-row {
+    @apply flex items-center gap-3 flex-wrap;
+  }
+  .youtube-widget-container .meta-chip {
+    @apply text-[12px] text-[#aaaaaa] flex items-center gap-1;
+  }
+  .youtube-widget-container .new-badge {
+    @apply text-[10px] font-bold tracking-[0.08em] bg-[#ff0000] text-white px-1.5 py-0.5 rounded uppercase;
+  }
+  .youtube-widget-container .yt-link {
+    @apply ml-auto text-[12px] text-[#ff0000] no-underline font-medium opacity-85 transition-opacity hover:opacity-100;
+  }
 </style>
 
 <script>
@@ -397,6 +512,89 @@ try {
     setInterval(update, 1000);
   }
 
-  // Initialize countdown
+  async function loadLatestVideo() {
+    const youtubeWidget = document.getElementById('youtubeWidget');
+    if (!youtubeWidget) return;
+
+    const API_KEY    = youtubeWidget.getAttribute('data-api-key');
+    const CHANNEL_ID = youtubeWidget.getAttribute('data-channel-id');
+
+    const playerWrap   = document.getElementById('playerWrap');
+    const stateOverlay = document.getElementById('stateOverlay');
+    const metaBox      = document.getElementById('metaBox');
+    const videoTitle   = document.getElementById('videoTitle');
+    const publishDate  = document.getElementById('publishDate');
+    const viewCount    = document.getElementById('viewCount');
+    const ytLink       = document.getElementById('ytLink');
+
+    if (!playerWrap || !API_KEY || !CHANNEL_ID) {
+      if (playerWrap && (!API_KEY || !CHANNEL_ID)) {
+        showError('Missing YouTube API key or Channel ID.');
+      }
+      return;
+    }
+
+    function showError(msg) {
+      if (stateOverlay) {
+        stateOverlay.innerHTML = `
+          <div class="text-2xl">⚠️</div>
+          <div class="text-[13px] text-[#aaaaaa] text-center px-6">${msg}</div>`;
+      }
+    }
+
+    function formatDate(iso) {
+      const d = new Date(iso);
+      return d.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+    }
+
+    function formatViews(n) {
+      if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M views';
+      if (n >= 1_000)     return Math.round(n / 1_000) + 'K views';
+      return n + ' views';
+    }
+
+    try {
+      const searchUrl = `https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&channelId=${CHANNEL_ID}&part=snippet&order=date&maxResults=1&type=video`;
+      const searchRes = await fetch(searchUrl);
+      if (!searchRes.ok) throw new Error(`API error: ${searchRes.status}`);
+      const searchData = await searchRes.json();
+
+      if (!searchData.items || searchData.items.length === 0) {
+        showError('No videos found on this channel.');
+        return;
+      }
+
+      const item    = searchData.items[0];
+      const videoId = item.id.videoId;
+      const title   = item.snippet.title;
+      const pubDate = item.snippet.publishedAt;
+
+      const statsUrl = `https://www.googleapis.com/youtube/v3/videos?key=${API_KEY}&id=${videoId}&part=statistics`;
+      const statsRes = await fetch(statsUrl);
+      const statsData = await statsRes.json();
+      const views = statsData.items?.[0]?.statistics?.viewCount ?? null;
+
+      const iframe = document.createElement('iframe');
+      iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=0&rel=0&modestbranding=1`;
+      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+      iframe.allowFullscreen = true;
+
+      if (stateOverlay) stateOverlay.remove();
+      playerWrap.appendChild(iframe);
+
+      if (videoTitle) videoTitle.textContent = title;
+      if (publishDate) publishDate.textContent = '📅 ' + formatDate(pubDate);
+      if (viewCount) viewCount.textContent   = views ? '👁 ' + formatViews(Number(views)) : '';
+      if (ytLink) ytLink.href = `https://www.youtube.com/watch?v=${videoId}`;
+      if (metaBox) metaBox.style.display = 'block';
+
+    } catch (err) {
+      showError('Error loading video: ' + err.message);
+      console.error(err);
+    }
+  }
+
+  // Initialize
   updateCountdown();
+  loadLatestVideo();
 </script>
