@@ -68,11 +68,18 @@ try {
 const BASE = "https://games.teletype.hu";
 const API_HIGHLIGHTED = BASE + "/api/software/highlighted";
 let highlightedSoftware = null;
+let highlightedStableRelease = null;
 
 try {
   const res = await fetch(API_HIGHLIGHTED);
   if (res.ok) {
     highlightedSoftware = await res.json();
+    if (highlightedSoftware?.releases) {
+      const stableReleases = highlightedSoftware.releases
+        .filter((r: any) => !r.version.startsWith('dev-'))
+        .sort((a: any, b: any) => new Date(b.UpdatedAt).getTime() - new Date(a.UpdatedAt).getTime());
+      highlightedStableRelease = stableReleases[0] ?? null;
+    }
   }
 } catch (e) {
   console.error('Failed to fetch highlighted software:', e);
@@ -141,13 +148,16 @@ const YOUTUBE_CHANNEL_ID = import.meta.env.YOUTUBE_CHANNEL_ID;
               <div class="flex items-center gap-2 mb-4">
                 <span class="featured-badge">Featured Game</span>
                 <span class="status-badge status-released">{highlightedSoftware.software.status}</span>
+                {highlightedStableRelease && (
+                  <span class="featured-version-badge">{highlightedStableRelease.version}</span>
+                )}
               </div>
               <h2 class="featured-title">{highlightedSoftware.software.title}</h2>
               <p class="featured-desc">{highlightedSoftware.software.desc}</p>
               
               <div class="flex flex-wrap gap-4 mt-8">
-                {highlightedSoftware.webPlayableRelease && (
-                  <a href={BASE + highlightedSoftware.webPlayableRelease.htmlFolderPath} target="_blank" class="featured-btn-play">
+                {highlightedStableRelease?.htmlFolderPath && (
+                  <a href={BASE + highlightedStableRelease.htmlFolderPath} target="_blank" class="featured-btn-play">
                     ▶ Play in Browser
                   </a>
                 )}
@@ -331,6 +341,9 @@ const YOUTUBE_CHANNEL_ID = import.meta.env.YOUTUBE_CHANNEL_ID;
   .status-demo { @apply bg-blue-500/20 text-blue-300 border border-blue-500/30; }
   .status-development { @apply bg-yellow-500/20 text-yellow-300 border border-yellow-500/30; }
   .status-archived { @apply bg-gray-500/20 text-gray-300 border border-gray-500/30; }
+  .featured-version-badge {
+    @apply px-2 py-0.5 rounded text-[10px] font-bold bg-white/10 text-white/70 border border-white/20;
+  }
 
   /* Countdown Card */
 

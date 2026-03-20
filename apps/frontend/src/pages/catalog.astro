@@ -26,7 +26,10 @@ const softwares = json.softwares;
     </div>
 
     <div class="grid grid-cols-1 gap-8 software-list">
-      {softwares.map(({ software, releases, latestRelease }) => (
+      {softwares.map(({ software, releases, latestRelease }) => {
+        const stableReleases = releases.filter((r: any) => !r.version.startsWith('dev-'));
+        const devReleases = releases.filter((r: any) => r.version.startsWith('dev-'));
+        return (
         <div class="software-card" data-status={software.status}>
           <div class="software-card-content">
             <div class="flex items-center gap-3 mb-2">
@@ -70,7 +73,7 @@ const softwares = json.softwares;
             <summary class="releases-summary">
               Releases ({releases.length})
             </summary>
-            
+
             <div class="mt-4">
               {/* Desktop Table View */}
               <div class="desktop-releases">
@@ -78,38 +81,40 @@ const softwares = json.softwares;
                   <thead class="releases-thead">
                     <tr>
                       <th scope="col" class="releases-th">Version</th>
-                      <th scope="col" class="releases-th">Date</th>
-                      <th scope="col" class="releases-th text-right">Actions</th>
+                      <th scope="col" class="releases-th">Created</th>
+                      <th scope="col" class="releases-th">Updated</th>
+                      <th scope="col" class="releases-th !text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody class="releases-tbody">
-                    {releases.map((release) => (
+                    {stableReleases.map((release: any) => (
                       <tr>
                         <td class="releases-td font-medium text-gray-900">{release.version}</td>
-                        <td class="releases-td text-gray-500">
-                          {new Date(release.CreatedAt).toLocaleDateString('en-US')}
-                        </td>
+                        <td class="releases-td text-gray-500">{new Date(release.CreatedAt).toLocaleDateString('en-US')}</td>
+                        <td class="releases-td text-gray-500">{new Date(release.UpdatedAt).toLocaleDateString('en-US')}</td>
                         <td class="releases-td text-right">
-                          {release.htmlFolderPath ? (
-                            <a href={BASE + release.htmlFolderPath} target="_blank" class="action-link-purple">▶ Play</a>
-                          ) : (
-                            <span class="action-link-disabled">▶ Play</span>
-                          )}
-                          {release.cartridgePath ? (
-                            <a href={BASE + release.cartridgePath} target="_blank" class="action-link-blue">Download</a>
-                          ) : (
-                            <span class="action-link-disabled">Download</span>
-                          )}
-                          {release.sourcePath ? (
-                            <a href={BASE + release.sourcePath} target="_blank" class="action-link-green">Source</a>
-                          ) : (
-                            <span class="action-link-disabled">Source</span>
-                          )}
-                          {release.docsFolderPath ? (
-                            <a href={BASE + release.docsFolderPath} target="_blank" class="action-link-yellow">Docs</a>
-                          ) : (
-                            <span class="action-link-disabled">Docs</span>
-                          )}
+                          {release.htmlFolderPath ? (<a href={BASE + release.htmlFolderPath} target="_blank" class="action-link-purple">▶ Play</a>) : (<span class="action-link-disabled">▶ Play</span>)}
+                          {release.cartridgePath ? (<a href={BASE + release.cartridgePath} target="_blank" class="action-link-blue">Download</a>) : (<span class="action-link-disabled">Download</span>)}
+                          {release.sourcePath ? (<a href={BASE + release.sourcePath} target="_blank" class="action-link-green">Source</a>) : (<span class="action-link-disabled">Source</span>)}
+                          {release.docsFolderPath ? (<a href={BASE + release.docsFolderPath} target="_blank" class="action-link-yellow">Docs</a>) : (<span class="action-link-disabled">Docs</span>)}
+                        </td>
+                      </tr>
+                    ))}
+                    {devReleases.length > 0 && (
+                      <tr>
+                        <td colspan="4" class="releases-td text-xs font-bold text-gray-400 uppercase tracking-wider pt-3 pb-1">Development Releases</td>
+                      </tr>
+                    )}
+                    {devReleases.map((release: any) => (
+                      <tr class="bg-yellow-50/50">
+                        <td class="releases-td font-medium text-yellow-800">{release.version}</td>
+                        <td class="releases-td text-gray-500">{new Date(release.CreatedAt).toLocaleDateString('en-US')}</td>
+                        <td class="releases-td text-gray-500">{new Date(release.UpdatedAt).toLocaleDateString('en-US')}</td>
+                        <td class="releases-td text-right">
+                          {release.htmlFolderPath ? (<a href={BASE + release.htmlFolderPath} target="_blank" class="action-link-purple">▶ Play</a>) : (<span class="action-link-disabled">▶ Play</span>)}
+                          {release.cartridgePath ? (<a href={BASE + release.cartridgePath} target="_blank" class="action-link-blue">Download</a>) : (<span class="action-link-disabled">Download</span>)}
+                          {release.sourcePath ? (<a href={BASE + release.sourcePath} target="_blank" class="action-link-green">Source</a>) : (<span class="action-link-disabled">Source</span>)}
+                          {release.docsFolderPath ? (<a href={BASE + release.docsFolderPath} target="_blank" class="action-link-yellow">Docs</a>) : (<span class="action-link-disabled">Docs</span>)}
                         </td>
                       </tr>
                     ))}
@@ -119,33 +124,36 @@ const softwares = json.softwares;
 
               {/* Mobile Stacked View */}
               <div class="mobile-releases">
-                {releases.map((release) => (
+                {stableReleases.map((release: any) => (
                   <div class="release-mobile-card">
                     <div class="release-mobile-header">
-                      <span class="release-mobile-version">v{release.version}</span>
-                      <span class="release-mobile-date">{new Date(release.CreatedAt).toLocaleDateString('en-US')}</span>
+                      <span class="release-mobile-version">{release.version}</span>
+                      <span class="release-mobile-date">Created: {new Date(release.CreatedAt).toLocaleDateString('en-US')}</span>
+                      <span class="release-mobile-date">Updated: {new Date(release.UpdatedAt).toLocaleDateString('en-US')}</span>
                     </div>
                     <div class="release-mobile-grid">
-                      {release.htmlFolderPath ? (
-                        <a href={BASE + release.htmlFolderPath} target="_blank" class="mobile-btn-play">▶ Play</a>
-                      ) : (
-                        <span class="mobile-btn-disabled">▶ Play</span>
-                      )}
-                      {release.cartridgePath ? (
-                        <a href={BASE + release.cartridgePath} target="_blank" class="mobile-btn-download">Download</a>
-                      ) : (
-                        <span class="mobile-btn-disabled">Download</span>
-                      )}
-                      {release.sourcePath ? (
-                        <a href={BASE + release.sourcePath} target="_blank" class="mobile-btn-source">Source</a>
-                      ) : (
-                        <span class="mobile-btn-disabled">Source</span>
-                      )}
-                      {release.docsFolderPath ? (
-                        <a href={BASE + release.docsFolderPath} target="_blank" class="mobile-btn-docs">Docs</a>
-                      ) : (
-                        <span class="mobile-btn-disabled">Docs</span>
-                      )}
+                      {release.htmlFolderPath ? (<a href={BASE + release.htmlFolderPath} target="_blank" class="mobile-btn-play">▶ Play</a>) : (<span class="mobile-btn-disabled">▶ Play</span>)}
+                      {release.cartridgePath ? (<a href={BASE + release.cartridgePath} target="_blank" class="mobile-btn-download">Download</a>) : (<span class="mobile-btn-disabled">Download</span>)}
+                      {release.sourcePath ? (<a href={BASE + release.sourcePath} target="_blank" class="mobile-btn-source">Source</a>) : (<span class="mobile-btn-disabled">Source</span>)}
+                      {release.docsFolderPath ? (<a href={BASE + release.docsFolderPath} target="_blank" class="mobile-btn-docs">Docs</a>) : (<span class="mobile-btn-disabled">Docs</span>)}
+                    </div>
+                  </div>
+                ))}
+                {devReleases.length > 0 && (
+                  <div class="text-xs font-bold text-gray-400 uppercase tracking-wider pt-3 pb-1">Development Releases</div>
+                )}
+                {devReleases.map((release: any) => (
+                  <div class="release-mobile-card border-yellow-200 bg-yellow-50">
+                    <div class="release-mobile-header">
+                      <span class="release-mobile-version text-yellow-800">{release.version}</span>
+                      <span class="release-mobile-date">Created: {new Date(release.CreatedAt).toLocaleDateString('en-US')}</span>
+                      <span class="release-mobile-date">Updated: {new Date(release.UpdatedAt).toLocaleDateString('en-US')}</span>
+                    </div>
+                    <div class="release-mobile-grid">
+                      {release.htmlFolderPath ? (<a href={BASE + release.htmlFolderPath} target="_blank" class="mobile-btn-play">▶ Play</a>) : (<span class="mobile-btn-disabled">▶ Play</span>)}
+                      {release.cartridgePath ? (<a href={BASE + release.cartridgePath} target="_blank" class="mobile-btn-download">Download</a>) : (<span class="mobile-btn-disabled">Download</span>)}
+                      {release.sourcePath ? (<a href={BASE + release.sourcePath} target="_blank" class="mobile-btn-source">Source</a>) : (<span class="mobile-btn-disabled">Source</span>)}
+                      {release.docsFolderPath ? (<a href={BASE + release.docsFolderPath} target="_blank" class="mobile-btn-docs">Docs</a>) : (<span class="mobile-btn-disabled">Docs</span>)}
                     </div>
                   </div>
                 ))}
@@ -154,7 +162,8 @@ const softwares = json.softwares;
           </details>
         </div>
       </div>
-    ))}
+        )
+      })}
     </div>
   </main>
 </Layout>
@@ -203,7 +212,7 @@ const softwares = json.softwares;
     @apply bg-white shadow-lg relative rounded-xl overflow-hidden hover:shadow-2xl transition-shadow duration-300;
   }
   .software-card-content {
-    @apply p-6 pr-28 sm:pr-6;
+    @apply p-6;
   }
   .software-title {
     @apply text-2xl font-semibold mb-2;
@@ -215,7 +224,7 @@ const softwares = json.softwares;
     @apply text-sm text-gray-500 mb-4;
   }
   .latest-release-actions {
-    @apply absolute top-4 right-4 flex flex-col sm:flex-row gap-1 z-10;
+    @apply flex flex-row flex-wrap gap-1 mb-4 sm:absolute sm:top-4 sm:right-4 sm:flex-col sm:mb-0 z-10;
   }
   
   /* Small Action Buttons */
