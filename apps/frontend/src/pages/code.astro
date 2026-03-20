@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { formatDateTime } from '../utils/dateFormat';
 
 const GITEA_API_BASE_URL = 'https://git.teletype.hu/api/v1';
 const GITEA_TOKEN = import.meta.env.WEBAPP_GITEA_TOKEN;
@@ -152,7 +153,7 @@ const recentCommits = allCommits.slice(0, 20);
             </h3>
             {repo.description && <p class="repo-card-desc">{repo.description}</p>}
             {repo.language && <p class="repo-card-meta">Language: {repo.language}</p>}
-            <p class="repo-card-meta">Updated: {new Date(repo.updated_at).toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric'})}</p>
+            <p class="repo-card-meta">Updated: {formatDateTime(repo.updated_at)}</p>
           </div>
         ))}
       </div>
@@ -178,9 +179,7 @@ const recentCommits = allCommits.slice(0, 20);
               : <span class="text-gray-700">{commit.message.split('\n')[0]}</span>
             </p>
             <p class="commit-meta">
-              Authored by <span class="font-bold">{commit.author.name}</span> on {new Date(commit.date).toLocaleDateString('en-US', {
-                year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
-              })}
+              Authored by <span class="font-bold">{commit.author.name}</span> on {formatDateTime(commit.date)}
               <a href={commit.url} target="_blank" class="commit-sha-link">
                 <span class="font-mono text-xs">{commit.sha.substring(0, 7)}</span>
               </a>

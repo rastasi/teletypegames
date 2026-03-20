@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { formatDateTime } from '../utils/dateFormat';
 const BASE = "https://games.teletype.hu";
 const API = BASE + "/api/software";
 
@@ -90,8 +91,8 @@ const softwares = json.softwares;
                     {stableReleases.map((release: any) => (
                       <tr>
                         <td class="releases-td font-medium text-gray-900">{release.version}</td>
-                        <td class="releases-td text-gray-500">{new Date(release.CreatedAt).toLocaleDateString('en-US')}</td>
-                        <td class="releases-td text-gray-500">{new Date(release.UpdatedAt).toLocaleDateString('en-US')}</td>
+                        <td class="releases-td text-gray-500">{formatDateTime(release.CreatedAt)}</td>
+                        <td class="releases-td text-gray-500">{formatDateTime(release.UpdatedAt)}</td>
                         <td class="releases-td text-right">
                           {release.htmlFolderPath ? (<a href={BASE + release.htmlFolderPath} target="_blank" class="action-link-purple">▶ Play</a>) : (<span class="action-link-disabled">▶ Play</span>)}
                           {release.cartridgePath ? (<a href={BASE + release.cartridgePath} target="_blank" class="action-link-blue">Download</a>) : (<span class="action-link-disabled">Download</span>)}
@@ -108,8 +109,8 @@ const softwares = json.softwares;
                     {devReleases.map((release: any) => (
                       <tr class="bg-yellow-50/50">
                         <td class="releases-td font-medium text-yellow-800">{release.version}</td>
-                        <td class="releases-td text-gray-500">{new Date(release.CreatedAt).toLocaleDateString('en-US')}</td>
-                        <td class="releases-td text-gray-500">{new Date(release.UpdatedAt).toLocaleDateString('en-US')}</td>
+                        <td class="releases-td text-gray-500">{formatDateTime(release.CreatedAt)}</td>
+                        <td class="releases-td text-gray-500">{formatDateTime(release.UpdatedAt)}</td>
                         <td class="releases-td text-right">
                           {release.htmlFolderPath ? (<a href={BASE + release.htmlFolderPath} target="_blank" class="action-link-purple">▶ Play</a>) : (<span class="action-link-disabled">▶ Play</span>)}
                           {release.cartridgePath ? (<a href={BASE + release.cartridgePath} target="_blank" class="action-link-blue">Download</a>) : (<span class="action-link-disabled">Download</span>)}
@@ -128,8 +129,8 @@ const softwares = json.softwares;
                   <div class="release-mobile-card">
                     <div class="release-mobile-header">
                       <span class="release-mobile-version">{release.version}</span>
-                      <span class="release-mobile-date">Created: {new Date(release.CreatedAt).toLocaleDateString('en-US')}</span>
-                      <span class="release-mobile-date">Updated: {new Date(release.UpdatedAt).toLocaleDateString('en-US')}</span>
+                      <span class="release-mobile-date">Created: {formatDateTime(release.CreatedAt)}</span>
+                      <span class="release-mobile-date">Updated: {formatDateTime(release.UpdatedAt)}</span>
                     </div>
                     <div class="release-mobile-grid">
                       {release.htmlFolderPath ? (<a href={BASE + release.htmlFolderPath} target="_blank" class="mobile-btn-play">▶ Play</a>) : (<span class="mobile-btn-disabled">▶ Play</span>)}
@@ -146,8 +147,8 @@ const softwares = json.softwares;
                   <div class="release-mobile-card border-yellow-200 bg-yellow-50">
                     <div class="release-mobile-header">
                       <span class="release-mobile-version text-yellow-800">{release.version}</span>
-                      <span class="release-mobile-date">Created: {new Date(release.CreatedAt).toLocaleDateString('en-US')}</span>
-                      <span class="release-mobile-date">Updated: {new Date(release.UpdatedAt).toLocaleDateString('en-US')}</span>
+                      <span class="release-mobile-date">Created: {formatDateTime(release.CreatedAt)}</span>
+                      <span class="release-mobile-date">Updated: {formatDateTime(release.UpdatedAt)}</span>
                     </div>
                     <div class="release-mobile-grid">
                       {release.htmlFolderPath ? (<a href={BASE + release.htmlFolderPath} target="_blank" class="mobile-btn-play">▶ Play</a>) : (<span class="mobile-btn-disabled">▶ Play</span>)}

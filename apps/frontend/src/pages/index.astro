@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { formatDateTime } from '../utils/dateFormat';
 import fs from 'node:fs';
 import path from 'node:path';
 import yaml from 'js-yaml';
@@ -43,19 +44,13 @@ try {
           name: first.name,
           date: first.date,
           dateISO: first.dateObj.toISOString(),
-          dateText: first.dateObj.toLocaleString('en-US', { 
-            year: 'numeric', month: 'short', day: 'numeric', 
-            hour: '2-digit', minute: '2-digit' 
-          })
+          dateText: formatDateTime(first.dateObj)
         };
 
         followingEvents = futureEvents.slice(1).map(e => ({
           name: e.name,
           date: e.date,
-          dateText: e.dateObj.toLocaleString('en-US', { 
-            year: 'numeric', month: 'short', day: 'numeric', 
-            hour: '2-digit', minute: '2-digit' 
-          })
+          dateText: formatDateTime(e.dateObj)
         }));
       }
     }
@@ -567,7 +562,12 @@ const YOUTUBE_CHANNEL_ID = import.meta.env.YOUTUBE_CHANNEL_ID;
 
     function formatDate(iso) {
       const d = new Date(iso);
-      return d.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      const h = String(d.getHours()).padStart(2, '0');
+      const min = String(d.getMinutes()).padStart(2, '0');
+      return `${y}-${m}-${day} ${h}:${min}`;
     }
 
     function formatViews(n) {
