@@ -156,8 +156,8 @@ const YOUTUBE_CHANNEL_ID = import.meta.env.YOUTUBE_CHANNEL_ID;
                     ▶ Play in Browser
                   </a>
                 )}
-                <a href="/catalog" class="featured-btn-secondary">
-                  View in Catalog
+                <a href={`/catalog/${highlightedSoftware.software.name}`} class="featured-btn-secondary">
+                  View Project Details
                 </a>
               </div>
             </div>
