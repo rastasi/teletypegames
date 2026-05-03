@@ -9,6 +9,6 @@ export default defineConfig({
   integrations: [tailwind()],
   server: {
     host: true,
-    allowedHosts: ['games.teletype.hu']
+    allowedHosts: ['teletypegames.org']
   }
 });
