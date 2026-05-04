@@ -15,7 +15,7 @@ type SoftwareRepository struct {
 
 func (r *SoftwareRepository) GetHighlighted() (*Software, error) {
 	var software Software
-	if err := r.db.Preload("Releases").Where("highlighted = 1").Order("id DESC").First(&software).Error; err != nil {
+	if err := r.db.Preload("Releases").Preload("ExternalLinks").Where("highlighted = 1").Order("id DESC").First(&software).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
 		}
@@ -27,7 +27,7 @@ func (r *SoftwareRepository) GetHighlighted() (*Software, error) {
 
 func (r *SoftwareRepository) GetByName(name string) (*Software, error) {
 	var software Software
-	if err := r.db.Preload("Releases").Where("name = ?", name).First(&software).Error; err != nil {
+	if err := r.db.Preload("Releases").Preload("ExternalLinks").Where("name = ?", name).First(&software).Error; err != nil {
 		return nil, err
 	}
 	return &software, nil
@@ -35,7 +35,7 @@ func (r *SoftwareRepository) GetByName(name string) (*Software, error) {
 
 func (r *SoftwareRepository) List() ([]Software, error) {
 	var softwares []Software
-	if err := r.db.Preload("Releases").Find(&softwares).Error; err != nil {
+	if err := r.db.Preload("Releases").Preload("ExternalLinks").Find(&softwares).Error; err != nil {
 		return nil, err
 	}
 	return softwares, nil

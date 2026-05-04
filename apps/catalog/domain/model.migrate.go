@@ -8,5 +8,6 @@ func MigrateGoDatabase(db *gorm.DB) {
 	db.AutoMigrate(
 		Software{},
 		Release{},
+		ExternalLink{},
 	)
 }

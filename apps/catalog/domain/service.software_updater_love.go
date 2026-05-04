@@ -20,20 +20,23 @@ type SoftwareUpdaterLoveServiceInterface interface {
 }
 
 type SoftwareUpdaterLoveService struct {
-	softwareRepository SoftwareRepositoryInterface
-	releaseRepository  ReleaseRepositoryInterface
-	fileRepository     FileRepositoryInterface
+	softwareRepository     SoftwareRepositoryInterface
+	releaseRepository      ReleaseRepositoryInterface
+	fileRepository         FileRepositoryInterface
+	externalLinkRepository ExternalLinkRepositoryInterface
 }
 
 func NewSoftwareUpdaterLoveService(
 	software_repository SoftwareRepositoryInterface,
 	release_repository ReleaseRepositoryInterface,
 	file_repository FileRepositoryInterface,
+	external_link_repository ExternalLinkRepositoryInterface,
 ) *SoftwareUpdaterLoveService {
 	return &SoftwareUpdaterLoveService{
-		softwareRepository: software_repository,
-		releaseRepository:  release_repository,
-		fileRepository:     file_repository,
+		softwareRepository:     software_repository,
+		releaseRepository:      release_repository,
+		fileRepository:         file_repository,
+		externalLinkRepository: external_link_repository,
 	}
 }
 
@@ -72,12 +75,19 @@ func (s *SoftwareUpdaterLoveService) Update(name, version string) error {
 		return err
 	}
 	fmt.Printf("Love Updater: Extracted metadata: %+v\n", meta_data)
+	siteURL := meta_data.Site
 	software := s.BuildSoftware(meta_data)
 
 	err = s.softwareRepository.UpdateOrCreate(software)
 	if err != nil {
 		fmt.Printf("Love Updater: Error updating or creating software: %s\n", err.Error())
 		return err
+	}
+
+	if siteURL != "" {
+		if linkErr := s.externalLinkRepository.UpsertByLabel(software.ID, "Source Code", siteURL); linkErr != nil {
+			fmt.Printf("Love Updater: Error upserting external link: %s\n", linkErr.Error())
+		}
 	}
 
 	release := Release{
@@ -101,7 +111,6 @@ func (s *SoftwareUpdaterLoveService) BuildSoftware(metadata SoftwareUpdaterLoveM
 		Title:    metadata.Title,
 		Author:   metadata.Author,
 		Desc:     metadata.Desc,
-		Site:     metadata.Site,
 		License:  metadata.License,
 		Platform: "love",
 	}

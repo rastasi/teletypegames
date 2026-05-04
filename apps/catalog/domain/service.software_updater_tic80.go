@@ -12,20 +12,23 @@ type SoftwareUpdaterTIC80ServiceInterface interface {
 }
 
 type SoftwareUpdaterTIC80Service struct {
-	softwareRepository SoftwareRepositoryInterface
-	releaseRepository  ReleaseRepositoryInterface
-	fileRepository     FileRepositoryInterface
+	softwareRepository     SoftwareRepositoryInterface
+	releaseRepository      ReleaseRepositoryInterface
+	fileRepository         FileRepositoryInterface
+	externalLinkRepository ExternalLinkRepositoryInterface
 }
 
 func NewSoftwareUpdaterTIC80Service(
 	software_repository SoftwareRepositoryInterface,
 	release_repository ReleaseRepositoryInterface,
 	file_repository FileRepositoryInterface,
+	external_link_repository ExternalLinkRepositoryInterface,
 ) *SoftwareUpdaterTIC80Service {
 	return &SoftwareUpdaterTIC80Service{
-		softwareRepository: software_repository,
-		releaseRepository:  release_repository,
-		fileRepository:     file_repository,
+		softwareRepository:     software_repository,
+		releaseRepository:      release_repository,
+		fileRepository:         file_repository,
+		externalLinkRepository: external_link_repository,
 	}
 }
 
@@ -79,11 +82,18 @@ func (s *SoftwareUpdaterTIC80Service) Update(name, version string) error {
 		return err
 	}
 
+	siteURL := meta_data["site"]
 	software := s.BuildSoftware(meta_data)
 	err = s.softwareRepository.UpdateOrCreate(software)
 	if err != nil {
 		fmt.Printf("TIC80 Updater: Error updating or creating software: %s\n", err.Error())
 		return err
+	}
+
+	if siteURL != "" {
+		if linkErr := s.externalLinkRepository.UpsertByLabel(software.ID, "Source Code", siteURL); linkErr != nil {
+			fmt.Printf("TIC80 Updater: Error upserting external link: %s\n", linkErr.Error())
+		}
 	}
 
 	fmt.Printf("TIC80 Updater: Creating release for software ID: %d, version: %s\n", software.ID, version)
@@ -108,7 +118,6 @@ func (s *SoftwareUpdaterTIC80Service) BuildSoftware(metadata map[string]string) 
 		Title:    metadata["title"],
 		Author:   metadata["author"],
 		Desc:     metadata["desc"],
-		Site:     metadata["site"],
 		License:  metadata["license"],
 		Platform: "tic80",
 	}
