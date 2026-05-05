@@ -20,6 +20,7 @@ module Api
 
     config.hosts << ENV["WEBAPP_DOMAIN"]           if ENV["WEBAPP_DOMAIN"].present?
     config.hosts << ENV["WEBAPP_TECHNICAL_DOMAIN"] if ENV["WEBAPP_TECHNICAL_DOMAIN"].present?
+    config.hosts << "teletypegames.org"
 
     config.autoload_lib(ignore: %w[assets tasks])
   end
