@@ -28,7 +28,7 @@ ActiveAdmin.register Event do
   form do |f|
     f.inputs do
       f.input :name
-      f.input :date, as: :date_time_picker
+      f.input :date, as: :datetime_select
     end
     f.actions
   end
