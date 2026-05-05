@@ -24,7 +24,7 @@ module Api
 
     # Traefik terminates SSL so Rails sees HTTP internally; disable the origin
     # header check (CSRF token itself is still validated)
-    config.action_dispatch.forgery_protection_origin_check = false
+    config.action_controller.forgery_protection_origin_check = false
 
     config.autoload_lib(ignore: %w[assets tasks])
   end
