@@ -73,10 +73,10 @@
               </div>
 
               <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-2 xl:grid-cols-4 gap-2 w-full md:w-auto">
-                <a v-if="latestStable.htmlFolderPath" :href="BASE + latestStable.htmlFolderPath" target="_blank" class="flex items-center justify-center py-3 px-4 bg-white text-indigo-900 font-bold rounded-xl transition-all hover:bg-indigo-50 shadow-lg shadow-black/10 text-sm whitespace-nowrap">▶ Play Now</a>
-                <a v-if="latestStable.cartridgePath" :href="BASE + latestStable.cartridgePath" target="_blank" class="flex items-center justify-center py-3 px-4 bg-indigo-500/30 border border-indigo-400/30 text-white font-bold rounded-xl transition-all hover:bg-indigo-500/40 text-sm whitespace-nowrap">💾 Download</a>
-                <a v-if="latestStable.sourcePath" :href="BASE + latestStable.sourcePath" target="_blank" class="flex items-center justify-center py-3 px-4 bg-indigo-500/30 border border-indigo-400/30 text-white font-bold rounded-xl transition-all hover:bg-indigo-500/40 text-sm whitespace-nowrap">📄 Source</a>
-                <a v-if="latestStable.docsFolderPath" :href="BASE + latestStable.docsFolderPath" target="_blank" class="flex items-center justify-center py-3 px-4 bg-indigo-500/30 border border-indigo-400/30 text-white font-bold rounded-xl transition-all hover:bg-indigo-500/40 text-sm whitespace-nowrap">📖 Docs</a>
+                <a v-if="latestStable.htmlFolderPath" :href="latestStable.htmlFolderPath" target="_blank" class="flex items-center justify-center py-3 px-4 bg-white text-indigo-900 font-bold rounded-xl transition-all hover:bg-indigo-50 shadow-lg shadow-black/10 text-sm whitespace-nowrap">▶ Play Now</a>
+                <a v-if="latestStable.cartridgePath" :href="latestStable.cartridgePath" target="_blank" class="flex items-center justify-center py-3 px-4 bg-indigo-500/30 border border-indigo-400/30 text-white font-bold rounded-xl transition-all hover:bg-indigo-500/40 text-sm whitespace-nowrap">💾 Download</a>
+                <a v-if="latestStable.sourcePath" :href="latestStable.sourcePath" target="_blank" class="flex items-center justify-center py-3 px-4 bg-indigo-500/30 border border-indigo-400/30 text-white font-bold rounded-xl transition-all hover:bg-indigo-500/40 text-sm whitespace-nowrap">📄 Source</a>
+                <a v-if="latestStable.docsFolderPath" :href="latestStable.docsFolderPath" target="_blank" class="flex items-center justify-center py-3 px-4 bg-indigo-500/30 border border-indigo-400/30 text-white font-bold rounded-xl transition-all hover:bg-indigo-500/40 text-sm whitespace-nowrap">📖 Docs</a>
               </div>
             </div>
           </div>
@@ -100,10 +100,10 @@
                       <td class="px-8 py-4">
                         <div class="font-bold text-gray-900 text-lg mb-2">{{ release.version }}</div>
                         <div class="flex flex-wrap gap-4">
-                          <a v-if="release.htmlFolderPath" :href="BASE + release.htmlFolderPath" target="_blank" class="text-purple-600 hover:text-purple-900 font-bold text-sm flex items-center gap-1">▶ Play</a>
-                          <a v-if="release.cartridgePath" :href="BASE + release.cartridgePath" target="_blank" class="text-blue-600 hover:text-blue-900 font-bold text-sm flex items-center gap-1">💾 Download</a>
-                          <a v-if="release.sourcePath" :href="BASE + release.sourcePath" target="_blank" class="text-green-600 hover:text-green-900 font-bold text-sm flex items-center gap-1">📄 Source</a>
-                          <a v-if="release.docsFolderPath" :href="BASE + release.docsFolderPath" target="_blank" class="text-yellow-600 hover:text-yellow-900 font-bold text-sm flex items-center gap-1">📖 Docs</a>
+                          <a v-if="release.htmlFolderPath" :href="release.htmlFolderPath" target="_blank" class="text-purple-600 hover:text-purple-900 font-bold text-sm flex items-center gap-1">▶ Play</a>
+                          <a v-if="release.cartridgePath" :href="release.cartridgePath" target="_blank" class="text-blue-600 hover:text-blue-900 font-bold text-sm flex items-center gap-1">💾 Download</a>
+                          <a v-if="release.sourcePath" :href="release.sourcePath" target="_blank" class="text-green-600 hover:text-green-900 font-bold text-sm flex items-center gap-1">📄 Source</a>
+                          <a v-if="release.docsFolderPath" :href="release.docsFolderPath" target="_blank" class="text-yellow-600 hover:text-yellow-900 font-bold text-sm flex items-center gap-1">📖 Docs</a>
                         </div>
                       </td>
                       <td class="px-8 py-4 text-gray-500 align-top pt-5">{{ formatDateTime(release.UpdatedAt) }}</td>
@@ -117,8 +117,8 @@
                       <td class="px-8 py-4">
                         <div class="font-bold text-yellow-800 text-lg mb-2">{{ release.version }}</div>
                         <div class="flex flex-wrap gap-4">
-                          <a v-if="release.htmlFolderPath" :href="BASE + release.htmlFolderPath" target="_blank" class="text-purple-600 hover:text-purple-900 font-bold text-sm flex items-center gap-1">▶ Play</a>
-                          <a v-if="release.cartridgePath" :href="BASE + release.cartridgePath" target="_blank" class="text-blue-600 hover:text-blue-900 font-bold text-sm flex items-center gap-1">💾 Download</a>
+                          <a v-if="release.htmlFolderPath" :href="release.htmlFolderPath" target="_blank" class="text-purple-600 hover:text-purple-900 font-bold text-sm flex items-center gap-1">▶ Play</a>
+                          <a v-if="release.cartridgePath" :href="release.cartridgePath" target="_blank" class="text-blue-600 hover:text-blue-900 font-bold text-sm flex items-center gap-1">💾 Download</a>
                         </div>
                       </td>
                       <td class="px-8 py-4 text-gray-500 align-top pt-5">{{ formatDateTime(release.UpdatedAt) }}</td>
@@ -142,10 +142,10 @@
                     <span v-if="release.version.startsWith('dev-')" class="px-2 py-0.5 bg-yellow-100 text-yellow-800 text-[10px] font-black uppercase rounded">Dev</span>
                   </div>
                   <div class="grid grid-cols-2 gap-2">
-                    <a v-if="release.htmlFolderPath" :href="BASE + release.htmlFolderPath" target="_blank" class="flex items-center justify-center py-2 bg-purple-100 text-purple-700 font-bold rounded-lg text-sm">Play</a>
-                    <a v-if="release.cartridgePath" :href="BASE + release.cartridgePath" target="_blank" class="flex items-center justify-center py-2 bg-blue-100 text-blue-700 font-bold rounded-lg text-sm">Download</a>
-                    <a v-if="release.sourcePath" :href="BASE + release.sourcePath" target="_blank" class="flex items-center justify-center py-2 bg-green-100 text-green-700 font-bold rounded-lg text-sm">Source</a>
-                    <a v-if="release.docsFolderPath" :href="BASE + release.docsFolderPath" target="_blank" class="flex items-center justify-center py-2 bg-yellow-100 text-yellow-700 font-bold rounded-lg text-sm">Docs</a>
+                    <a v-if="release.htmlFolderPath" :href="release.htmlFolderPath" target="_blank" class="flex items-center justify-center py-2 bg-purple-100 text-purple-700 font-bold rounded-lg text-sm">Play</a>
+                    <a v-if="release.cartridgePath" :href="release.cartridgePath" target="_blank" class="flex items-center justify-center py-2 bg-blue-100 text-blue-700 font-bold rounded-lg text-sm">Download</a>
+                    <a v-if="release.sourcePath" :href="release.sourcePath" target="_blank" class="flex items-center justify-center py-2 bg-green-100 text-green-700 font-bold rounded-lg text-sm">Source</a>
+                    <a v-if="release.docsFolderPath" :href="release.docsFolderPath" target="_blank" class="flex items-center justify-center py-2 bg-yellow-100 text-yellow-700 font-bold rounded-lg text-sm">Docs</a>
                   </div>
                 </div>
               </div>
@@ -166,34 +166,12 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
-import { formatDateTime } from '../utils/dateFormat'
-import { GAMES_BASE } from '../config'
+import { formatDateTime } from '../../lib/dateFormat'
+import softwareApi from '../../api/software.api'
+import type { Release, Software } from '../../lib/interfaces/software.interface'
 
-const BASE = GAMES_BASE
 const route = useRoute()
-
-interface Release {
-  version: string
-  htmlFolderPath?: string
-  cartridgePath?: string
-  sourcePath?: string
-  docsFolderPath?: string
-  UpdatedAt: string
-}
-
-interface SoftwareItem {
-  name: string
-  title: string
-  desc: string
-  status: string
-  author: string
-  platform: string
-  license?: string
-  story?: string
-  externalLinks?: { label: string; url: string }[]
-}
-
-const software = ref<SoftwareItem | null>(null)
+const software = ref<Software | null>(null)
 const releases = ref<Release[]>([])
 const error = ref<string | null>(null)
 
@@ -210,14 +188,12 @@ const devReleases = computed(() =>
 )
 
 const allReleases = computed(() => [...stableReleases.value, ...devReleases.value])
-
 const latestStable = computed(() => stableReleases.value[0] ?? null)
 
 onMounted(async () => {
   try {
-    const res = await fetch(`${BASE}/api/software`)
-    const json = await res.json()
-    const item = json.softwares.find((s: any) => s.software.name === route.params.name)
+    const all = await softwareApi.index()
+    const item = all.find(s => s.software.name === route.params.name)
     if (item) {
       software.value = item.software
       releases.value = item.releases

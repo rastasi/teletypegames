@@ -76,24 +76,11 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
-import { formatDateTime } from '../utils/dateFormat'
-import { WIKI_BASE } from '../config'
+import { formatDateTime } from '../../lib/dateFormat'
+import wikiApi from '../../api/wiki.api'
+import type { WikiPageWithContent } from '../../lib/interfaces/wiki.interface'
 
-const WIKIJS_BASE_URL = WIKI_BASE
-const WIKIJS_TOKEN = import.meta.env.WEBAPP_WIKIJS_TOKEN
-
-interface WikiPage {
-  id: number
-  path: string
-  title: string
-  description: string
-  content: string
-  updatedAt: string
-  createdAt: string
-  locale: string
-}
-
-const blogPages = ref<WikiPage[]>([])
+const blogPages = ref<WikiPageWithContent[]>([])
 const error = ref<string | null>(null)
 const loading = ref(true)
 
@@ -112,60 +99,8 @@ function getCleanPreview(content: string): string {
 }
 
 onMounted(async () => {
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-  }
-  if (WIKIJS_TOKEN) {
-    headers['Authorization'] = `Bearer ${WIKIJS_TOKEN}`
-  }
-
-  const LIST_QUERY = `
-    {
-      pages {
-        list(orderBy: CREATED, orderByDirection: DESC, tags: ["blog"]) {
-          id path title description updatedAt createdAt locale
-        }
-      }
-    }
-  `
-
   try {
-    const listRes = await fetch(`${WIKIJS_BASE_URL}/graphql`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({ query: LIST_QUERY }),
-    })
-    const listJson = await listRes.json()
-    if (listJson.errors) throw new Error(`GraphQL error: ${listJson.errors.map((e: any) => e.message).join(', ')}`)
-
-    const pages = listJson?.data?.pages?.list ?? []
-
-    const pagesWithContent = await Promise.all(pages.map(async (p: any) => {
-      try {
-        const CONTENT_QUERY = `{ pages { single(id: ${p.id}) { content } } }`
-        const contentRes = await fetch(`${WIKIJS_BASE_URL}/graphql`, {
-          method: 'POST',
-          headers,
-          body: JSON.stringify({ query: CONTENT_QUERY }),
-        })
-        const contentJson = await contentRes.json()
-        return { ...p, content: contentJson?.data?.pages?.single?.content ?? '' }
-      } catch {
-        return { ...p, content: '' }
-      }
-    }))
-
-    blogPages.value = pagesWithContent.map((p: any) => ({
-      id: p.id,
-      path: p.path,
-      title: p.title || p.path,
-      description: p.description ?? '',
-      content: p.content ?? '',
-      updatedAt: p.updatedAt,
-      createdAt: p.createdAt,
-      locale: p.locale,
-    }))
+    blogPages.value = await wikiApi.listBlogPages()
   } catch (e: any) {
     error.value = `Failed to fetch wiki data: ${e.message}`
   } finally {

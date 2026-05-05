@@ -60,79 +60,27 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { formatDateTime } from '../utils/dateFormat'
-import { GIT_BASE } from '../config'
-
-const GITEA_API_BASE_URL = GIT_BASE
-const GITEA_TOKEN = import.meta.env.WEBAPP_GITEA_TOKEN
-
-interface GiteaRepo {
-  owner: { login: string }
-  name: string
-  description: string
-  language?: string
-  html_url: string
-  updated_at: string
-}
-
-interface Commit {
-  sha: string
-  message: string
-  author: { name: string; email: string }
-  date: string
-  url: string
-  repo: { owner: string; name: string; html_url: string }
-}
+import { formatDateTime } from '../../lib/dateFormat'
+import gitApi from '../../api/git.api'
+import type { GiteaRepo, Commit } from '../../lib/interfaces/git.interface'
 
 const publicRepos = ref<GiteaRepo[]>([])
 const recentCommits = ref<Commit[]>([])
 const error = ref<string | null>(null)
 
 onMounted(async () => {
-  if (!GITEA_TOKEN) {
-    error.value = 'Gitea API token (WEBAPP_GITEA_TOKEN) is not configured.'
-    return
-  }
-
-  const headers = {
-    'Authorization': `token ${GITEA_TOKEN}`,
-    'Accept': 'application/json',
-  }
-
   try {
-    const reposRes = await fetch(`${GITEA_API_BASE_URL}/repos/search?q=&private=false&limit=50`, { headers })
-    if (!reposRes.ok) throw new Error(`Gitea API responded with status ${reposRes.status}`)
+    publicRepos.value = await gitApi.repos()
 
-    const reposData = await reposRes.json()
-    publicRepos.value = reposData.data || []
-
-    const commitPromises = publicRepos.value.map(async (repo) => {
-      try {
-        const res = await fetch(
-          `${GITEA_API_BASE_URL}/repos/${repo.owner.login}/${repo.name}/commits?limit=10&page=1`,
-          { headers }
-        )
-        if (!res.ok) return []
-        const data = await res.json()
-        if (!Array.isArray(data)) return []
-        return data.map((c: any): Commit => ({
-          sha: c.sha,
-          message: c.commit?.message ?? '',
-          author: { name: c.commit?.author?.name ?? 'Unknown', email: c.commit?.author?.email ?? '' },
-          date: c.commit?.author?.date ?? c.created,
-          url: c.html_url,
-          repo: { owner: repo.owner.login, name: repo.name, html_url: repo.html_url },
-        }))
-      } catch {
-        return []
-      }
-    })
+    const commitPromises = publicRepos.value.map(repo =>
+      gitApi.commits(repo.owner.login, repo.name, repo.html_url)
+    )
 
     const all = (await Promise.all(commitPromises)).flat()
     all.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     recentCommits.value = all.slice(0, 20)
   } catch (e: any) {
-    error.value = `Failed to fetch Gitea data: ${e.message}`
+    error.value = e.message
   }
 })
 </script>

@@ -41,7 +41,7 @@
               <div class="flex flex-wrap gap-2 items-center">
                 <a
                   v-if="getLatestStable(releases)?.htmlFolderPath"
-                  :href="BASE + getLatestStable(releases).htmlFolderPath"
+                  :href="getLatestStable(releases).htmlFolderPath"
                   target="_blank"
                   class="btn-play-sm"
                 >▶ Play</a>
@@ -60,31 +60,12 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
-import { GAMES_BASE } from '../config'
+import softwareApi from '../../api/software.api'
+import type { Release, SoftwareEntry } from '../../lib/interfaces/software.interface'
 
-const BASE = GAMES_BASE
 const filters = ['all', 'released', 'demo', 'development', 'archived']
 const activeFilter = ref('all')
-
-interface Release {
-  version: string
-  htmlFolderPath?: string
-  cartridgePath?: string
-  sourcePath?: string
-  docsFolderPath?: string
-  UpdatedAt: string
-}
-
-interface Software {
-  name: string
-  title: string
-  desc: string
-  status: string
-  author: string
-  platform: string
-}
-
-const softwares = ref<{ software: Software; releases: Release[] }[]>([])
+const softwares = ref<SoftwareEntry[]>([])
 
 function getLatestStable(releases: Release[]): Release {
   return releases
@@ -94,9 +75,7 @@ function getLatestStable(releases: Release[]): Release {
 
 onMounted(async () => {
   try {
-    const res = await fetch(`${BASE}/api/software`)
-    const json = await res.json()
-    softwares.value = json.softwares
+    softwares.value = await softwareApi.index()
   } catch (e) {
     console.error('Failed to load catalog:', e)
   }

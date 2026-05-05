@@ -42,85 +42,22 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
-import { formatDateTime } from '../utils/dateFormat'
-import { WIKI_BASE } from '../config'
-
-const WIKIJS_BASE_URL = WIKI_BASE
-const WIKIJS_TOKEN = import.meta.env.WEBAPP_WIKIJS_TOKEN
-
-interface PageContent {
-  id: number
-  path: string
-  title: string
-  description: string
-  render: string
-  createdAt: string
-  updatedAt: string
-}
+import { formatDateTime } from '../../lib/dateFormat'
+import wikiApi from '../../api/wiki.api'
+import type { WikiPageContent } from '../../lib/interfaces/wiki.interface'
 
 const route = useRoute()
-const pageContent = ref<PageContent | null>(null)
+const pageContent = ref<WikiPageContent | null>(null)
 const error = ref<string | null>(null)
 const loading = ref(true)
 
 onMounted(async () => {
   const slug = route.params.slug as string
-
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-  }
-  if (WIKIJS_TOKEN) {
-    headers['Authorization'] = `Bearer ${WIKIJS_TOKEN}`
-  }
-
   try {
-    // Find page ID by fetching the list and matching the slug
-    const LIST_QUERY = `
-      {
-        pages {
-          list(orderBy: CREATED, orderByDirection: DESC, tags: ["blog"]) {
-            id path
-          }
-        }
-      }
-    `
-    const listRes = await fetch(`${WIKIJS_BASE_URL}/graphql`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({ query: LIST_QUERY }),
-    })
-    const listJson = await listRes.json()
-    const pages: any[] = listJson?.data?.pages?.list ?? []
-
-    const matchedPage = pages.find((p: any) => {
-      const pageSlug = p.path.startsWith('blog/') ? p.path.replace('blog/', '') : p.path
-      return pageSlug === slug
-    })
-
-    if (!matchedPage) {
-      error.value = 'Post not found'
-      return
-    }
-
-    const SINGLE_QUERY = `
-      {
-        pages {
-          single(id: ${matchedPage.id}) {
-            id path title description render updatedAt createdAt
-          }
-        }
-      }
-    `
-    const singleRes = await fetch(`${WIKIJS_BASE_URL}/graphql`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({ query: SINGLE_QUERY }),
-    })
-    const singleJson = await singleRes.json()
-    pageContent.value = singleJson?.data?.pages?.single ?? null
-
-    if (!pageContent.value) {
+    const result = await wikiApi.getBlogPage(slug)
+    if (result) {
+      pageContent.value = result
+    } else {
       error.value = 'Post not found'
     }
   } catch (e: any) {

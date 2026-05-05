@@ -5,6 +5,6 @@
 </template>
 
 <script setup lang="ts">
-import AppLayout from './components/AppLayout.vue'
+import AppLayout from './layout/AppLayout.vue'
 import { RouterView } from 'vue-router'
 </script>

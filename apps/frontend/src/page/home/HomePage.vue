@@ -53,7 +53,7 @@
             <div class="flex flex-wrap gap-4 mt-8">
               <a
                 v-if="highlightedStableRelease?.htmlFolderPath"
-                :href="BASE + highlightedStableRelease.htmlFolderPath"
+                :href="highlightedStableRelease.htmlFolderPath"
                 target="_blank"
                 class="featured-btn-play"
               >▶ Play in Browser</a>
@@ -186,19 +186,17 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import { RouterLink } from 'vue-router'
-import { formatDateTime } from '../utils/dateFormat'
-import { GAMES_BASE } from '../config'
-
-const BASE = GAMES_BASE
-const YOUTUBE_API_KEY = import.meta.env.YOUTUBE_API_KEY
-const YOUTUBE_CHANNEL_ID = import.meta.env.YOUTUBE_CHANNEL_ID
-
-interface Event { name: string; date: string }
+import { formatDateTime } from '../../lib/dateFormat'
+import eventApi from '../../api/event.api'
+import softwareApi from '../../api/software.api'
+import youtubeApi from '../../api/youtube.api'
+import type { Event } from '../../lib/interfaces/event.interface'
+import type { SoftwareEntry, Release } from '../../lib/interfaces/software.interface'
 
 const nextEvent = ref<(Event & { dateISO: string; dateText: string }) | null>(null)
 const followingEvents = ref<(Event & { dateText: string })[]>([])
-const highlightedSoftware = ref<any>(null)
-const highlightedStableRelease = ref<any>(null)
+const highlightedSoftware = ref<SoftwareEntry | null>(null)
+const highlightedStableRelease = ref<Release | null>(null)
 const countdownText = ref('-- : -- : -- : --')
 
 const ytState = ref<'loading' | 'loaded' | 'error' | 'no-config'>('loading')
@@ -242,89 +240,48 @@ function formatViews(n: number): string {
   return n + ' views'
 }
 
-async function loadLatestVideo() {
-  if (!YOUTUBE_API_KEY || !YOUTUBE_CHANNEL_ID) {
-    ytState.value = 'no-config'
-    return
-  }
-
-  try {
-    const searchRes = await fetch(`https://www.googleapis.com/youtube/v3/search?key=${YOUTUBE_API_KEY}&channelId=${YOUTUBE_CHANNEL_ID}&part=snippet&order=date&maxResults=1&type=video`)
-    if (!searchRes.ok) throw new Error(`API error: ${searchRes.status}`)
-    const searchData = await searchRes.json()
-
-    if (!searchData.items?.length) {
-      ytError.value = 'No videos found on this channel.'
-      ytState.value = 'error'
-      return
-    }
-
-    const item = searchData.items[0]
-    const videoId = item.id.videoId
-    const title = item.snippet.title
-    const pubDate = item.snippet.publishedAt
-
-    const statsRes = await fetch(`https://www.googleapis.com/youtube/v3/videos?key=${YOUTUBE_API_KEY}&id=${videoId}&part=statistics`)
-    const statsData = await statsRes.json()
-    const views = statsData.items?.[0]?.statistics?.viewCount ?? null
-
-    ytVideoId.value = videoId
-    ytTitle.value = title
-    ytPublishDate.value = formatYtDate(pubDate)
-    ytViewCount.value = views ? formatViews(Number(views)) : ''
-    ytState.value = 'loaded'
-  } catch (err: any) {
-    ytError.value = 'Error loading video: ' + err.message
-    ytState.value = 'error'
-  }
-}
-
 onMounted(async () => {
-  // Load events
   try {
-    const res = await fetch(BASE + '/api/events')
-    if (res.ok) {
-      const events: Event[] = await res.json()
-      if (events.length > 0) {
-        const first = events[0]
-        const firstDate = new Date(first.date)
-        nextEvent.value = {
-          name: first.name,
-          date: first.date,
-          dateISO: firstDate.toISOString(),
-          dateText: formatDateTime(firstDate),
-        }
-        followingEvents.value = events.slice(1).map(e => ({
-          name: e.name,
-          date: e.date,
-          dateText: formatDateTime(new Date(e.date)),
-        }))
-        startCountdown(firstDate.toISOString())
-      }
+    const events = await eventApi.index()
+    if (events.length > 0) {
+      const first = events[0]
+      const firstDate = new Date(first.date)
+      nextEvent.value = { name: first.name, date: first.date, dateISO: firstDate.toISOString(), dateText: formatDateTime(firstDate) }
+      followingEvents.value = events.slice(1).map(e => ({ name: e.name, date: e.date, dateText: formatDateTime(new Date(e.date)) }))
+      startCountdown(firstDate.toISOString())
     }
   } catch (e) {
     console.error('Failed to load events:', e)
   }
 
-  // Load highlighted software
   try {
-    const res = await fetch(BASE + '/api/software/highlighted')
-    if (res.ok) {
-      const data = await res.json()
-      highlightedSoftware.value = data
-      if (data?.releases) {
-        const stable = data.releases
-          .filter((r: any) => !r.version.startsWith('dev-'))
-          .sort((a: any, b: any) => new Date(b.UpdatedAt).getTime() - new Date(a.UpdatedAt).getTime())
-        highlightedStableRelease.value = stable[0] ?? null
-      }
+    const data = await softwareApi.highlighted()
+    highlightedSoftware.value = data
+    if (data?.releases) {
+      const stable = data.releases
+        .filter((r: Release) => !r.version.startsWith('dev-'))
+        .sort((a: Release, b: Release) => new Date(b.UpdatedAt).getTime() - new Date(a.UpdatedAt).getTime())
+      highlightedStableRelease.value = stable[0] ?? null
     }
   } catch (e) {
     console.error('Failed to fetch highlighted software:', e)
   }
 
-  // Load YouTube
-  await loadLatestVideo()
+  try {
+    const video = await youtubeApi.latestVideo()
+    if (!video) {
+      ytState.value = 'no-config'
+      return
+    }
+    ytVideoId.value = video.id
+    ytTitle.value = video.title
+    ytPublishDate.value = formatYtDate(video.publishDate)
+    ytViewCount.value = video.viewCount ? formatViews(Number(video.viewCount)) : ''
+    ytState.value = 'loaded'
+  } catch (err: any) {
+    ytError.value = 'Error loading video: ' + err.message
+    ytState.value = 'error'
+  }
 })
 
 onUnmounted(() => {

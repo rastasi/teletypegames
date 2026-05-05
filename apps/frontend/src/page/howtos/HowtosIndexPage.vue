@@ -14,7 +14,7 @@
         <p class="hero-subtitle mb-10">
           The latest documentation, technical guides, and development logs from our knowledge base.
         </p>
-        <a :href="WIKIJS_BASE_URL" target="_blank" class="btn-hero-indigo">
+        <a :href="WIKI_BASE" target="_blank" class="btn-hero-indigo">
           Knowledge Base
         </a>
       </div>
@@ -39,7 +39,7 @@
         <a
           v-for="page in recentPages"
           :key="page.id"
-          :href="`${WIKIJS_BASE_URL}/${page.locale}/${page.path}`"
+          :href="`${WIKI_BASE}/${page.locale}/${page.path}`"
           target="_blank"
           class="group card-interactive flex flex-col"
         >
@@ -66,7 +66,7 @@
       </div>
 
       <div v-if="!error && recentPages.length > 0" class="howtos-footer">
-        <a :href="WIKIJS_BASE_URL" target="_blank" class="browse-wiki-btn">
+        <a :href="WIKI_BASE" target="_blank" class="browse-wiki-btn">
           Browse Wiki Home
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -79,21 +79,9 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { formatDateTime } from '../utils/dateFormat'
-import { WIKI_BASE } from '../config'
-
-const WIKIJS_BASE_URL = WIKI_BASE
-const WIKIJS_TOKEN = import.meta.env.WEBAPP_WIKIJS_TOKEN
-
-interface WikiPage {
-  id: number
-  path: string
-  title: string
-  description: string
-  updatedAt: string
-  createdAt: string
-  locale: string
-}
+import { formatDateTime } from '../../lib/dateFormat'
+import wikiApi, { WIKI_BASE } from '../../api/wiki.api'
+import type { WikiPage } from '../../lib/interfaces/wiki.interface'
 
 const recentPages = ref<WikiPage[]>([])
 const error = ref<string | null>(null)
@@ -104,46 +92,8 @@ function isNew(createdAt: string): boolean {
 }
 
 onMounted(async () => {
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-  }
-  if (WIKIJS_TOKEN) {
-    headers['Authorization'] = `Bearer ${WIKIJS_TOKEN}`
-  }
-
-  const GRAPHQL_QUERY = `
-    {
-      pages {
-        list(orderBy: UPDATED, orderByDirection: DESC, tags: ["howto"]) {
-          id path title description updatedAt createdAt locale
-        }
-      }
-    }
-  `
-
   try {
-    const response = await fetch(`${WIKIJS_BASE_URL}/graphql`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({ query: GRAPHQL_QUERY }),
-    })
-
-    if (!response.ok) throw new Error(`WikiJS responded with status ${response.status}`)
-
-    const json = await response.json()
-    if (json.errors) throw new Error(`GraphQL error: ${json.errors.map((e: any) => e.message).join(', ')}`)
-
-    const pages: any[] = json?.data?.pages?.list ?? []
-    recentPages.value = pages.map((p: any) => ({
-      id: p.id,
-      path: p.path,
-      title: p.title || p.path,
-      description: p.description ?? '',
-      updatedAt: p.updatedAt,
-      createdAt: p.createdAt,
-      locale: p.locale,
-    })).slice(0, 30)
+    recentPages.value = await wikiApi.listHowtoPages()
   } catch (e: any) {
     error.value = `Failed to fetch wiki data: ${e.message}`
   } finally {

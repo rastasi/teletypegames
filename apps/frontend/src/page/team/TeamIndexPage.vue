@@ -25,23 +25,21 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-
-interface Member {
-  nick: string
-  real_nick: string
-  motto: string
-  avatar_filename: string
-}
+import memberApi from '../../api/member.api'
+import type { Member } from '../../lib/interfaces/member.interface'
 
 const members = ref<Member[]>([])
 
 function avatarUrl(filename: string): string {
-  return new URL(`../assets/team/${filename}`, import.meta.url).href
+  return new URL(`../../assets/team/${filename}`, import.meta.url).href
 }
 
 onMounted(async () => {
-  const res = await fetch('/api/members')
-  if (res.ok) members.value = await res.json()
+  try {
+    members.value = await memberApi.index()
+  } catch (e) {
+    console.error('Failed to load team members:', e)
+  }
 })
 </script>
 
