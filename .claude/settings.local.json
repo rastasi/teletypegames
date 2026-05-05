@@ -2,7 +2,10 @@
   "permissions": {
     "allow": [
       "Bash(go build *)",
-      "Bash(go vet *)"
+      "Bash(go vet *)",
+      "Bash(chmod +x *)",
+      "Bash(xargs ruby *)",
+      "Bash(docker compose exec *)"
     ]
   }
 }

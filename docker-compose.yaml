@@ -138,12 +138,13 @@ services:
       - proxy
       - interstack
 
-  catalog:
+  api:
     build:
-      context: ./apps/catalog
+      context: ./apps/api
       dockerfile: Dockerfile.development
-    container_name: catalog
+    container_name: api
     environment:
+      - RAILS_ENV=development
       - DB_USER=root
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_HOST=mysql
@@ -151,18 +152,22 @@ services:
       - DB_NAME=softwares
       - UPDATE_SECRET=${UPDATE_SECRET}
       - FILE_CONTAINER_PATH=/softwares
+      - SECRET_KEY_BASE=${SECRET_KEY_BASE:-changeme_in_production_use_long_random_string}
+      - ADMIN_EMAIL=${ADMIN_EMAIL:-admin@teletype.hu}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-password123}
     depends_on:
       mysql:
         condition: service_healthy
     volumes:
       - ./data/softwares:/softwares
-      - ./apps/catalog:/app
+      - ./apps/api:/app
+      - api_bundle:/usr/local/bundle
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.catalog.rule=Host(`${WEBAPP_DOMAIN}`) && (PathPrefix(`/api`) || PathPrefix(`/file`) || PathPrefix(`/update`))"
-      - "traefik.http.routers.catalog.entrypoints=web"
-      - "traefik.http.routers.catalog.priority=10"
-      - "traefik.http.services.catalog.loadbalancer.server.port=80"
+      - "traefik.http.routers.api.rule=Host(`${WEBAPP_DOMAIN}`) && (PathPrefix(`/api`) || PathPrefix(`/file`) || PathPrefix(`/update`) || PathPrefix(`/admin`))"
+      - "traefik.http.routers.api.entrypoints=web"
+      - "traefik.http.routers.api.priority=10"
+      - "traefik.http.services.api.loadbalancer.server.port=3000"
       - "traefik.docker.network=proxy"
     networks:
       - proxy
@@ -192,6 +197,7 @@ volumes:
   woodpecker:
   mysql-data:
   softwares:
+  api_bundle:
 
 networks:
   proxy:

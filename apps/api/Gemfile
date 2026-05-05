@@ -1,0 +1,16 @@
+source "https://rubygems.org"
+
+gem "rails", "~> 8.0"
+gem "mysql2", "~> 0.5"
+gem "puma", ">= 5.0"
+gem "rubyzip", "~> 2.3"
+gem "bootsnap", require: false
+
+gem "activeadmin"
+gem "devise"
+gem "sprockets-rails"
+gem "sassc-rails"
+
+group :development, :test do
+  gem "debug", platforms: %i[mri windows]
+end

@@ -1,0 +1,18 @@
+class Software < ApplicationRecord
+  self.table_name = "softwares"
+
+  has_many :releases, foreign_key: :software_id
+  has_many :external_links, foreign_key: :software_id
+
+  accepts_nested_attributes_for :external_links, allow_destroy: true
+
+  default_scope { where(deleted_at: nil) }
+
+  def self.ransackable_attributes(auth_object = nil)
+    %w[author created_at desc highlighted id license name platform site status story title updated_at]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    %w[releases external_links]
+  end
+end

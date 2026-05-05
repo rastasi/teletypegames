@@ -5,3 +5,5 @@ teletype_softwares
 pma-config.user.inc.php
 data
 apps/frontend/src/events.yaml
+NOTES_*
+
