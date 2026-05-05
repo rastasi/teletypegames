@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_05_000004) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_05_000005) do
   create_table "admin_users", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email", default: "", null: false
@@ -29,6 +29,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_05_000004) do
     t.string "slug"
     t.string "title"
     t.timestamp "updated_at", default: -> { "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP" }
+  end
+
+  create_table "events", id: { type: :bigint, unsigned: true }, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.datetime "created_at", precision: 3, null: false
+    t.datetime "date", null: false
+    t.datetime "deleted_at", precision: 3
+    t.string "name", null: false
+    t.datetime "updated_at", precision: 3, null: false
+    t.index ["date"], name: "idx_events_date"
+    t.index ["deleted_at"], name: "idx_events_deleted_at"
   end
 
   create_table "external_links", id: { type: :bigint, unsigned: true }, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
