@@ -10,7 +10,9 @@
       "Bash(rm /Users/tasi/Work/TTG/teletypegames/apps/frontend/src/pages/catalog/\\\\[name\\\\].astro)",
       "Bash(npm install *)",
       "Bash(npx vue-tsc *)",
-      "Bash(npx vite *)"
+      "Bash(npx vite *)",
+      "Bash(xargs ls -la)",
+      "Bash(xargs ls)"
     ]
   }
 }

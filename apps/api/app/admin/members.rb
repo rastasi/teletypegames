@@ -34,7 +34,7 @@ ActiveAdmin.register Member do
         f.input :motto
         f.input :avatar_filename,
                 hint: "Fallback image filename (e.g. mr.zero.png) — only used when no image is selected above."
-        f.input :image, as: :select,
+        f.input :image_id, as: :select, label: "Image",
                         collection: Image.order(:original_filename).map { |img| [img.original_filename, img.id] },
                         include_blank: "— no image (use avatar_filename) —"
       end
@@ -49,7 +49,7 @@ ActiveAdmin.register Member do
       f.input :motto
       f.input :avatar_filename,
               hint: "Fallback image filename (e.g. mr.zero.png) — only used when no image is selected above."
-      f.input :image, as: :select,
+      f.input :image_id, as: :select, label: "Image",
                       collection: Image.order(:original_filename).map { |img| [img.original_filename, img.id] },
                       include_blank: "— no image (use avatar_filename) —"
     end

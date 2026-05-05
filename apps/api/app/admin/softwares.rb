@@ -44,7 +44,7 @@ ActiveAdmin.register Software do
         f.input :status,   as: :select, collection: %w[development demo released archived]
         f.input :highlighted
         f.input :license
-        f.input :image,    as: :select,
+        f.input :image_id, as: :select, label: "Image",
                            collection: Image.order(:original_filename).map { |img| [img.original_filename, img.id] },
                            include_blank: "— no image —"
         f.input :desc,  as: :text, input_html: { rows: 4 }
@@ -82,7 +82,7 @@ ActiveAdmin.register Software do
       f.input :status,   as: :select, collection: %w[development demo released archived]
       f.input :highlighted
       f.input :license
-      f.input :image,    as: :select,
+      f.input :image_id, as: :select, label: "Image",
                          collection: Image.order(:original_filename).map { |img| [img.original_filename, img.id] },
                          include_blank: "— no image —"
       f.input :desc,  as: :text, input_html: { rows: 4 }
