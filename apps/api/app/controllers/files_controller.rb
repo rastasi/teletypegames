@@ -4,6 +4,9 @@ class FilesController < ApplicationController
     full = base.join(params[:path])
 
     return render plain: "Not Found", status: :not_found unless full.to_s.start_with?(base.to_s)
+
+    full = full.join("index.html") if full.exist? && full.directory?
+
     return render plain: "Not Found", status: :not_found unless full.exist? && full.file?
 
     send_file full.to_s, disposition: "inline"
