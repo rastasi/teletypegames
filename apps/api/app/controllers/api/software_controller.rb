@@ -1,8 +1,5 @@
-module Api
-  class SoftwareController < ApiController
-    def index
-      result = SoftwareListService.new.call
-      render json: result
-    end
+class Api::SoftwareController < ApiController
+  def index
+    render json: SoftwareListService.new.call
   end
 end

@@ -1,17 +1,10 @@
-require "json"
-
 module SoftwareUpdater
   class LoveService < BaseService
     def update(name, version)
       versioned = "#{name}-#{version}"
-      zip_file  = "#{versioned}.html.zip"
-      html_dir  = versioned
+      extract_zip_to_dir("#{versioned}.html.zip", versioned)
 
-      delete_dir(html_dir) if dir_exists?(html_dir)
-      create_dir(html_dir)
-      unzip_file(zip_file, html_dir)
-
-      metadata = parse_metadata(full_path("#{versioned}.metadata.json"))
+      metadata = parse_json_metadata(full_path("#{versioned}.metadata.json"))
       site_url = metadata.delete(:site)
 
       software = update_or_create_software(metadata.merge(platform: "love"))
@@ -20,15 +13,8 @@ module SoftwareUpdater
       create_release_if_not_exists(
         software_id:      software.id,
         version:          version,
-        html_folder_path: full_path(html_dir)
+        html_folder_path: full_path(versioned)
       )
-    end
-
-    private
-
-    def parse_metadata(path)
-      raw = JSON.parse(File.read(path), symbolize_names: true)
-      raw.slice(:name, :title, :author, :desc, :site, :license)
     end
   end
 end

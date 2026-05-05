@@ -1,4 +1,5 @@
 require "zip"
+require "json"
 require "fileutils"
 
 module SoftwareUpdater
@@ -34,6 +35,17 @@ module SoftwareUpdater
           entry.extract(entry_dest) { true }
         end
       end
+    end
+
+    def extract_zip_to_dir(zip_file, dir_name)
+      delete_dir(dir_name) if dir_exists?(dir_name)
+      create_dir(dir_name)
+      unzip_file(zip_file, dir_name)
+    end
+
+    def parse_json_metadata(path)
+      raw = JSON.parse(File.read(path), symbolize_names: true)
+      raw.slice(:name, :title, :author, :desc, :site, :license)
     end
 
     def update_or_create_software(attrs)

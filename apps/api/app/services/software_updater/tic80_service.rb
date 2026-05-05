@@ -1,20 +1,11 @@
 module SoftwareUpdater
   class Tic80Service < BaseService
     def update(name, version)
-      versioned     = "#{name}-#{version}"
-      zip_file      = "#{versioned}.html.zip"
-      docs_zip_file = "#{versioned}-docs.zip"
-      html_dir      = versioned
-      docs_dir      = "#{versioned}-docs"
+      versioned = "#{name}-#{version}"
+      docs_dir  = "#{versioned}-docs"
 
-      delete_dir(html_dir) if dir_exists?(html_dir)
-      delete_dir(docs_dir) if dir_exists?(docs_dir)
-
-      create_dir(html_dir)
-      unzip_file(zip_file, html_dir)
-
-      create_dir(docs_dir)
-      unzip_file(docs_zip_file, docs_dir)
+      extract_zip_to_dir("#{versioned}.html.zip", versioned)
+      extract_zip_to_dir("#{versioned}-docs.zip", docs_dir)
 
       metadata = parse_lua_metadata(full_path("#{versioned}.lua"))
       site_url = metadata.delete(:site)
@@ -23,11 +14,11 @@ module SoftwareUpdater
       upsert_external_link(software.id, "Source Code", site_url) if site_url.present?
 
       create_release_if_not_exists(
-        software_id:     software.id,
-        version:         version,
-        cartridge_path:  full_path("#{versioned}.tic"),
-        source_path:     full_path("#{versioned}.lua"),
-        html_folder_path: full_path(html_dir),
+        software_id:      software.id,
+        version:          version,
+        cartridge_path:   full_path("#{versioned}.tic"),
+        source_path:      full_path("#{versioned}.lua"),
+        html_folder_path: full_path(versioned),
         docs_folder_path: full_path(docs_dir)
       )
     end
