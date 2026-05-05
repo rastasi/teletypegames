@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_05_000005) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_05_000006) do
   create_table "admin_users", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email", default: "", null: false
@@ -143,6 +143,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_05_000005) do
     t.timestamp "updated_at", default: -> { "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP" }
     t.string "username", limit: 100, null: false
     t.index ["username"], name: "users_username_unique", unique: true
+  end
+
+  create_table "members", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "avatar_filename"
+    t.datetime "created_at", null: false
+    t.text "motto"
+    t.string "nick", null: false
+    t.string "real_nick", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "releases", id: { type: :bigint, unsigned: true }, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|

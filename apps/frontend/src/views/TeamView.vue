@@ -10,13 +10,13 @@
 
   <main class="main-container py-16 px-4">
     <div class="team-grid">
-      <div v-for="member in teamMembers" :key="member.name" class="team-card">
+      <div v-for="member in members" :key="member.nick" class="team-card">
         <div class="team-card-image-container">
-          <img :src="member.image" :alt="member.name" class="team-card-image" />
+          <img :src="avatarUrl(member.avatar_filename)" :alt="member.nick" class="team-card-image" />
         </div>
         <div class="team-card-content">
-          <h2 class="team-card-title">{{ member.name }}</h2>
-          <p class="team-card-desc">{{ member.description }}</p>
+          <h2 class="team-card-title">{{ member.nick }}: {{ member.real_nick }}</h2>
+          <p class="team-card-desc">{{ member.motto }}</p>
         </div>
       </div>
     </div>
@@ -24,17 +24,25 @@
 </template>
 
 <script setup lang="ts">
-import mrZeroImg from '../assets/team/mr.zero.png'
-import mrOneImg from '../assets/team/mr.one.png'
-import mrTwoImg from '../assets/team/mr.two.png'
-import mrThreeImg from '../assets/team/mr.three.png'
+import { ref, onMounted } from 'vue'
 
-const teamMembers = [
-  { name: 'Mr. Zero: Tasi', description: 'His dream is to become an open-source knight.', image: mrZeroImg },
-  { name: 'Mr. One: Ballz', description: 'The cheese is half-eaten. Something here went very wrong.', image: mrOneImg },
-  { name: 'Mr. Two: Z', description: "The egg was first or the chicken? It doesn't matter, we eat both.", image: mrTwoImg },
-  { name: 'Mr. Three: gBird', description: 'Life is beautiful because it contains the possibility of becoming human.', image: mrThreeImg },
-]
+interface Member {
+  nick: string
+  real_nick: string
+  motto: string
+  avatar_filename: string
+}
+
+const members = ref<Member[]>([])
+
+function avatarUrl(filename: string): string {
+  return new URL(`../assets/team/${filename}`, import.meta.url).href
+}
+
+onMounted(async () => {
+  const res = await fetch('/api/members')
+  if (res.ok) members.value = await res.json()
+})
 </script>
 
 <style scoped>
