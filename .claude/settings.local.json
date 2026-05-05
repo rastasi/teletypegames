@@ -5,7 +5,12 @@
       "Bash(go vet *)",
       "Bash(chmod +x *)",
       "Bash(xargs ruby *)",
-      "Bash(docker compose exec *)"
+      "Bash(docker compose exec *)",
+      "Bash(rm /Users/tasi/Work/TTG/teletypegames/apps/frontend/src/pages/blog/\\\\[...slug\\\\].astro)",
+      "Bash(rm /Users/tasi/Work/TTG/teletypegames/apps/frontend/src/pages/catalog/\\\\[name\\\\].astro)",
+      "Bash(npm install *)",
+      "Bash(npx vue-tsc *)",
+      "Bash(npx vite *)"
     ]
   }
 }

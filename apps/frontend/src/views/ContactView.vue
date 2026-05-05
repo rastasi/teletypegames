@@ -1,21 +1,11 @@
----
-import Layout from '../layouts/Layout.astro';
-
-const DISCORD_INVITE_LINK = import.meta.env.DISCORD_INVITE_LINK || "https://discord.gg/your-discord-link";
----
-
-<Layout>
+<template>
   <header class="hero-section-gradient from-blue-600 to-indigo-700 py-20 text-white">
     <div class="hero-container text-center">
       <h1 class="hero-title mb-6">Contact Us</h1>
       <p class="hero-subtitle mb-10 text-blue-100">
         Have questions, feedback, or just want to say hi? We'd love to hear from you!
       </p>
-      <a 
-        href={DISCORD_INVITE_LINK} 
-        target="_blank" 
-        class="discord-hero-btn"
-      >
+      <a :href="DISCORD_INVITE_LINK" target="_blank" class="discord-hero-btn">
         <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
           <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037 19.736 19.736 0 0 0-4.885 1.515.069.069 0 0 0-.032.027C.533 9.048-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.862-1.297 1.197-1.99.051-.105.001-.23-.106-.272a13.223 13.223 0 0 1-1.878-.894.077.077 0 0 1-.007-.128c.126-.094.252-.192.372-.29a.074.074 0 0 1 .077-.01c3.927 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .077.01c.12.098.246.196.373.29a.077.077 0 0 1-.006.128 12.299 12.299 0 0 1-1.878.894.077.077 0 0 0-.106.272c.335.693.735 1.36 1.197 1.99a.078.078 0 0 0 .084.028 19.83 19.83 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.182 0-2.156-1.085-2.156-2.419 0-1.333.956-2.419 2.156-2.419 1.21 0 2.176 1.096 2.156 2.419 0 1.334-.956 2.419-2.156 2.419zm7.974 0c-1.182 0-2.156-1.085-2.156-2.419 0-1.333.955-2.419 2.156-2.419 1.21 0 2.176 1.096 2.156 2.419 0 1.334-.946 2.419-2.156 2.419z"/>
         </svg>
@@ -33,23 +23,9 @@ const DISCORD_INVITE_LINK = import.meta.env.DISCORD_INVITE_LINK || "https://disc
         <p class="contact-card-desc">
           For business inquiries, support, or detailed feedback, feel free to drop us an email.
         </p>
-        <div id="email-container" class="email-link">
-          <span class="opacity-50 text-sm font-normal italic">Loading email...</span>
+        <div @click="openEmail" class="email-link cursor-pointer">
+          contact@teletype.hu
         </div>
-
-        <script is:inline>
-          // Simple obfuscation to thwart basic scrapers
-          const user = 'contact';
-          const domain = 'teletype.hu';
-          const element = document.getElementById('email-container');
-          
-          if (element) {
-            element.innerHTML = `${user}@${domain}`;
-            element.addEventListener('click', () => {
-              window.location.href = `mailto:${user}@${domain}`;
-            });
-          }
-        </script>
       </div>
 
       <div class="contact-card">
@@ -59,12 +35,12 @@ const DISCORD_INVITE_LINK = import.meta.env.DISCORD_INVITE_LINK || "https://disc
         <p class="contact-card-desc mb-8">
           Join our primarily Hungarian-speaking community (English speakers are also welcome!).
         </p>
-        
+
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 justify-center">
           <div class="community-section border-[#5865F2]">
             <h3 class="community-section-title text-[#5865F2]">Discord</h3>
             <p class="community-section-desc">We have a vibrant Discord server for real-time chat and support.</p>
-            <a href={DISCORD_INVITE_LINK} target="_blank" class="community-link-discord">
+            <a :href="DISCORD_INVITE_LINK" target="_blank" class="community-link-discord">
               Join Discord Server <span>→</span>
             </a>
           </div>
@@ -98,58 +74,66 @@ const DISCORD_INVITE_LINK = import.meta.env.DISCORD_INVITE_LINK || "https://disc
       </div>
     </div>
   </main>
-</Layout>
+</template>
 
-<style>
-  .discord-hero-btn {
-    @apply inline-flex items-center gap-3 bg-[#5865F2] hover:bg-[#4752C4] text-white font-black py-4 px-8 rounded-full text-lg transition-all transform hover:scale-105 shadow-xl;
-  }
-  .contact-grid {
-    @apply grid grid-cols-1 gap-12 max-w-5xl mx-auto;
-  }
-  .contact-card {
-    @apply bg-white p-8 rounded-2xl shadow-xl border border-gray-100;
-  }
-  .contact-card-title {
-    @apply text-2xl font-black text-gray-900 mb-6 flex items-center gap-3;
-  }
-  .contact-card-desc {
-    @apply text-gray-600 mb-6 leading-relaxed;
-  }
-  .email-link {
-    @apply text-indigo-600 font-bold text-xl hover:underline cursor-pointer transition-all;
-  }
-  .community-section {
-    @apply border-l-4 pl-4;
-  }
-  .community-section-title {
-    @apply text-lg font-bold text-green-700 mb-2;
-  }
-  .community-section-desc {
-    @apply text-gray-600 text-sm mb-3;
-  }
-  .community-link-discord {
-    @apply text-[#5865F2] font-bold hover:underline inline-flex items-center gap-1;
-  }
-  .community-link-youtube {
-    @apply text-red-600 font-bold hover:underline inline-flex items-center gap-1;
-  }
-  .irc-box {
-    @apply bg-green-100 p-4 rounded-xl border border-green-200 mt-3 inline-block;
-  }
-  .irc-network {
-    @apply block text-xs font-semibold text-green-500 uppercase tracking-wider mb-1;
-  }
-  .irc-channel {
-    @apply text-green-800 font-mono text-lg font-bold;
-  }
-  .bbs-box {
-    @apply bg-amber-50 p-4 rounded-xl border border-amber-100 mt-3 inline-block;
-  }
-  .bbs-host {
-    @apply block text-xs font-semibold text-amber-500 uppercase tracking-wider mb-1;
-  }
-  .bbs-port {
-    @apply text-amber-700 font-mono text-lg font-bold;
-  }
+<script setup lang="ts">
+const DISCORD_INVITE_LINK = import.meta.env.DISCORD_INVITE_LINK || 'https://discord.gg/your-discord-link'
+
+function openEmail() {
+  window.location.href = 'mailto:contact@teletype.hu'
+}
+</script>
+
+<style scoped>
+.discord-hero-btn {
+  @apply inline-flex items-center gap-3 bg-[#5865F2] hover:bg-[#4752C4] text-white font-black py-4 px-8 rounded-full text-lg transition-all transform hover:scale-105 shadow-xl;
+}
+.contact-grid {
+  @apply grid grid-cols-1 gap-12 max-w-5xl mx-auto;
+}
+.contact-card {
+  @apply bg-white p-8 rounded-2xl shadow-xl border border-gray-100;
+}
+.contact-card-title {
+  @apply text-2xl font-black text-gray-900 mb-6 flex items-center gap-3;
+}
+.contact-card-desc {
+  @apply text-gray-600 mb-6 leading-relaxed;
+}
+.email-link {
+  @apply text-indigo-600 font-bold text-xl hover:underline transition-all;
+}
+.community-section {
+  @apply border-l-4 pl-4;
+}
+.community-section-title {
+  @apply text-lg font-bold mb-2;
+}
+.community-section-desc {
+  @apply text-gray-600 text-sm mb-3;
+}
+.community-link-discord {
+  @apply text-[#5865F2] font-bold hover:underline inline-flex items-center gap-1;
+}
+.community-link-youtube {
+  @apply text-red-600 font-bold hover:underline inline-flex items-center gap-1;
+}
+.irc-box {
+  @apply bg-green-100 p-4 rounded-xl border border-green-200 mt-3 inline-block;
+}
+.irc-network {
+  @apply block text-xs font-semibold text-green-500 uppercase tracking-wider mb-1;
+}
+.irc-channel {
+  @apply text-green-800 font-mono text-lg font-bold;
+}
+.bbs-box {
+  @apply bg-amber-50 p-4 rounded-xl border border-amber-100 mt-3 inline-block;
+}
+.bbs-host {
+  @apply block text-xs font-semibold text-amber-500 uppercase tracking-wider mb-1;
+}
+.bbs-port {
+  @apply text-amber-700 font-mono text-lg font-bold;
+}
 </style>
