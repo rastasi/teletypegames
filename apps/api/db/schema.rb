@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_05_000006) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_05_000009) do
   create_table "admin_users", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email", default: "", null: false
@@ -145,13 +145,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_05_000006) do
     t.index ["username"], name: "users_username_unique", unique: true
   end
 
+  create_table "images", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "content_type", default: "application/octet-stream", null: false
+    t.datetime "created_at", null: false
+    t.string "filename", null: false
+    t.string "original_filename", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "members", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "avatar_filename"
     t.datetime "created_at", null: false
+    t.bigint "image_id"
     t.text "motto"
     t.string "nick", null: false
     t.string "real_nick", null: false
     t.datetime "updated_at", null: false
+    t.index ["image_id"], name: "index_members_on_image_id"
   end
 
   create_table "releases", id: { type: :bigint, unsigned: true }, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -175,6 +185,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_05_000006) do
     t.datetime "deleted_at", precision: 3
     t.text "desc"
     t.boolean "highlighted", default: false
+    t.bigint "image_id"
     t.string "license", limit: 128
     t.string "name", limit: 128
     t.string "platform", limit: 128
@@ -184,9 +195,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_05_000006) do
     t.string "title"
     t.datetime "updated_at", precision: 3
     t.index ["deleted_at"], name: "idx_softwares_deleted_at"
+    t.index ["image_id"], name: "index_softwares_on_image_id"
     t.index ["name"], name: "idx_softwares_name", unique: true
   end
 
   add_foreign_key "external_links", "softwares", name: "fk_softwares_external_links"
+  add_foreign_key "members", "images"
   add_foreign_key "releases", "softwares", name: "fk_softwares_releases"
+  add_foreign_key "softwares", "images"
 end
