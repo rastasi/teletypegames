@@ -323,10 +323,10 @@ onUnmounted(() => {
   @apply px-8 py-4 bg-indigo-500/10 text-white border border-indigo-400/30 font-bold rounded-xl transition-all hover:bg-indigo-500/20;
 }
 .featured-image-panel {
-  @apply flex-shrink-0 w-full md:w-64 lg:w-80 overflow-hidden;
+  @apply flex-shrink-0 flex items-center justify-center p-6 md:p-8;
 }
 .featured-image {
-  @apply w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity;
+  @apply max-h-48 w-auto object-contain border-4 border-white shadow-xl opacity-90 group-hover:opacity-100 transition-opacity;
 }
 .featured-version-badge {
   @apply px-2 py-0.5 rounded text-[10px] font-bold bg-white/10 text-white/70 border border-white/20;

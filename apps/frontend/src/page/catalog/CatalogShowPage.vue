@@ -27,8 +27,8 @@
         <!-- Sidebar Info -->
         <div class="lg:col-span-1 space-y-6">
           <div class="bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
-            <div v-if="software.imageUrl" class="mb-6">
-              <img :src="software.imageUrl" :alt="software.title" class="w-full rounded-2xl object-cover shadow-sm" />
+            <div v-if="software.imageUrl" class="mb-6 flex justify-center">
+              <img :src="software.imageUrl" :alt="software.title" class="max-h-48 w-auto object-contain border-4 border-gray-100 shadow-sm" />
             </div>
             <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
               <span class="text-purple-600">ℹ</span> Project Info
