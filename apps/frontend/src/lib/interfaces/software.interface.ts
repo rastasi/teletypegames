@@ -17,6 +17,7 @@ export interface Software {
   license?: string
   story?: string
   externalLinks?: { label: string; url: string }[]
+  imageUrl?: string | null
 }
 
 export interface SoftwareEntry {

@@ -23,6 +23,9 @@
         <div v-show="activeFilter === 'all' || software.status === activeFilter" class="software-card group">
           <div class="software-card-content">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div v-if="software.imageUrl" class="flex-shrink-0">
+                <img :src="software.imageUrl" :alt="software.title" class="software-thumb" />
+              </div>
               <div class="flex-grow">
                 <div class="flex items-center gap-3 mb-2">
                   <RouterLink :to="`/catalog/${software.name}`" class="hover:text-purple-600 transition-colors">
@@ -116,4 +119,7 @@ onMounted(async () => {
 }
 .btn-play-sm { @apply btn-base-sm bg-purple-600 hover:bg-purple-700 text-white shadow-lg shadow-purple-600/20; }
 .btn-info-sm { @apply btn-base-sm bg-gray-100 hover:bg-gray-200 text-gray-700; }
+.software-thumb {
+  @apply w-24 h-24 object-cover rounded-xl border border-gray-100 shadow-sm;
+}
 </style>

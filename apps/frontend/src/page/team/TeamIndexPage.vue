@@ -12,7 +12,7 @@
     <div class="team-grid">
       <div v-for="member in members" :key="member.nick" class="team-card">
         <div class="team-card-image-container">
-          <img :src="avatarUrl(member.avatar_filename)" :alt="member.nick" class="team-card-image" />
+          <img :src="resolvedAvatarUrl(member)" :alt="member.nick" class="team-card-image" />
         </div>
         <div class="team-card-content">
           <h2 class="team-card-title">{{ member.nick }}: {{ member.real_nick }}</h2>
@@ -30,8 +30,9 @@ import type { Member } from '../../lib/interfaces/member.interface'
 
 const members = ref<Member[]>([])
 
-function avatarUrl(filename: string): string {
-  return new URL(`../../assets/team/${filename}`, import.meta.url).href
+function resolvedAvatarUrl(member: Member): string {
+  if (member.image_url) return member.image_url
+  return new URL(`../../assets/team/${member.avatar_filename}`, import.meta.url).href
 }
 
 onMounted(async () => {

@@ -7,6 +7,7 @@ Rails.application.routes.draw do
     get "software/highlighted", to: "software_highlighted#index"
     get "events",               to: "events#index"
     get "members",              to: "members#index"
+    get "image/:id",            to: "images#show"
   end
 
   get "update",       to: "update#update"

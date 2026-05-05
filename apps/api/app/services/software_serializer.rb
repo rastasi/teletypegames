@@ -32,7 +32,8 @@ class SoftwareSerializer
       "platform"     => sw.platform,
       "status"       => sw.status,
       "highlighted"  => sw.highlighted ? true : false,
-      "externalLinks" => sw.external_links.map { |el| serialize_external_link(el) }
+      "externalLinks" => sw.external_links.map { |el| serialize_external_link(el) },
+      "imageUrl"     => sw.image_id ? "/api/image/#{sw.image_id}" : nil
     }
   end
 

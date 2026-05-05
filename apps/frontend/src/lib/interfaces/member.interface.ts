@@ -3,4 +3,5 @@ export interface Member {
   real_nick: string
   motto: string
   avatar_filename: string
+  image_url?: string | null
 }

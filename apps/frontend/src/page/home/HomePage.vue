@@ -41,6 +41,9 @@
       <!-- Featured Software Section -->
       <section v-if="highlightedSoftware" class="mb-16">
         <div class="featured-card group">
+          <div v-if="highlightedSoftware.software.imageUrl" class="featured-image-panel">
+            <img :src="highlightedSoftware.software.imageUrl" :alt="highlightedSoftware.software.title" class="featured-image" />
+          </div>
           <div class="featured-content">
             <div class="flex items-center gap-2 mb-4">
               <span class="featured-badge">Featured Game</span>
@@ -318,6 +321,12 @@ onUnmounted(() => {
 }
 .featured-btn-secondary {
   @apply px-8 py-4 bg-indigo-500/10 text-white border border-indigo-400/30 font-bold rounded-xl transition-all hover:bg-indigo-500/20;
+}
+.featured-image-panel {
+  @apply flex-shrink-0 w-full md:w-64 lg:w-80 overflow-hidden;
+}
+.featured-image {
+  @apply w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity;
 }
 .featured-version-badge {
   @apply px-2 py-0.5 rounded text-[10px] font-bold bg-white/10 text-white/70 border border-white/20;

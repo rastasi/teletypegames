@@ -1,6 +1,6 @@
 class SoftwareHighlightedService
   def call
-    software = Software.includes(:external_links)
+    software = Software.includes(:external_links, :image)
                        .where(highlighted: true)
                        .order(id: :desc)
                        .first

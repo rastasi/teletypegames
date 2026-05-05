@@ -157,6 +157,7 @@ services:
       - DB_NAME=softwares
       - UPDATE_SECRET=${UPDATE_SECRET}
       - FILE_CONTAINER_PATH=/softwares
+      - IMAGE_CONTAINER_PATH=/images
       - SECRET_KEY_BASE=${SECRET_KEY_BASE:-changeme_in_production_use_long_random_string}
       - ADMIN_EMAIL=${ADMIN_EMAIL:-admin@teletype.hu}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD:-password123}
@@ -165,6 +166,7 @@ services:
         condition: service_healthy
     volumes:
       - ./data/softwares:/softwares
+      - ./data/images:/images
       - ./apps/api:/app
       - api_bundle:/usr/local/bundle
     labels:
