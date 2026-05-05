@@ -1,58 +1,35 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { formatDateTime } from '../utils/dateFormat';
-import fs from 'node:fs';
-import path from 'node:path';
-import yaml from 'js-yaml';
 
 interface Event {
   name: string;
   date: string;
 }
 
-interface EventData {
-  events: Event[];
-}
+const BASE = "https://games.teletype.hu";
 
 let nextEvent: (Event & { dateISO: string; dateText: string }) | null = null;
 let followingEvents: (Event & { dateText: string })[] = [];
 
 try {
-  const rootDir = process.cwd();
-  let eventsPath = path.join(rootDir, 'src', 'events.yaml');
-  if (!fs.existsSync(eventsPath)) {
-    eventsPath = path.join(rootDir, 'src', 'events-example.yaml');
-  }
-
-  if (fs.existsSync(eventsPath)) {
-    const fileContents = fs.readFileSync(eventsPath, 'utf8');
-    const data = yaml.load(fileContents) as EventData;
-    
-    if (data && data.events) {
-      const now = new Date();
-      const futureEvents = data.events
-        .map(e => ({
-          ...e,
-          dateObj: new Date(e.date)
-        }))
-        .filter(e => e.dateObj > now)
-        .sort((a, b) => a.dateObj.getTime() - b.dateObj.getTime());
-
-      if (futureEvents.length > 0) {
-        const first = futureEvents[0];
-        nextEvent = {
-          name: first.name,
-          date: first.date,
-          dateISO: first.dateObj.toISOString(),
-          dateText: formatDateTime(first.dateObj)
-        };
-
-        followingEvents = futureEvents.slice(1).map(e => ({
-          name: e.name,
-          date: e.date,
-          dateText: formatDateTime(e.dateObj)
-        }));
-      }
+  const res = await fetch(BASE + "/api/events");
+  if (res.ok) {
+    const events: Event[] = await res.json();
+    if (events.length > 0) {
+      const first = events[0];
+      const firstDate = new Date(first.date);
+      nextEvent = {
+        name: first.name,
+        date: first.date,
+        dateISO: firstDate.toISOString(),
+        dateText: formatDateTime(firstDate)
+      };
+      followingEvents = events.slice(1).map(e => ({
+        name: e.name,
+        date: e.date,
+        dateText: formatDateTime(new Date(e.date))
+      }));
     }
   }
 } catch (e) {
@@ -60,7 +37,6 @@ try {
 }
 
 // Fetch highlighted software
-const BASE = "https://games.teletype.hu";
 const API_HIGHLIGHTED = BASE + "/api/software/highlighted";
 let highlightedSoftware = null;
 let highlightedStableRelease = null;

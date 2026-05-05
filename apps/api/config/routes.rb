@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   namespace :api do
     get "software",             to: "software#index"
     get "software/highlighted", to: "software_highlighted#index"
+    get "events",               to: "events#index"
   end
 
   get "update",       to: "update#update"
