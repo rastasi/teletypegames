@@ -13,6 +13,14 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/proxy\/wiki/, '')
       },
+      '/_assets': {
+        target: 'https://wiki.teletype.hu',
+        changeOrigin: true,
+      },
+      '/_error': {
+        target: 'https://wiki.teletype.hu',
+        changeOrigin: true,
+      },
       '/proxy/git': {
         target: 'https://git.teletype.hu',
         changeOrigin: true,
