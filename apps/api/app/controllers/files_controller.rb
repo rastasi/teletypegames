@@ -1,16 +1,19 @@
 class FilesController < ApplicationController
+  skip_forgery_protection
+
+  BASE_PATH = Pathname.new(ENV.fetch("FILE_CONTAINER_PATH", "/softwares")).realpath
   def show
-    base = Pathname.new(ENV.fetch("FILE_CONTAINER_PATH", "/softwares")).realpath
-    full = base.join(params[:path])
+    requested = params[:path].to_s
+    full_path = BASE_PATH.join(requested)
 
-    return render plain: "Not Found", status: :not_found unless full.to_s.start_with?(base.to_s)
+    if File.directory?(full_path)
+      full_path = full_path.join('index.html')
+    end
 
-    full = full.join("index.html") if full.exist? && full.directory?
-
-    return render plain: "Not Found", status: :not_found unless full.exist? && full.file?
-
-    send_file full.to_s, disposition: "inline"
-  rescue Errno::ENOENT
-    render plain: "Not Found", status: :not_found
+    if File.file?(full_path)
+      send_file full_path, disposition: 'inline'
+    else
+      head :not_found
+    end  
   end
 end

@@ -11,5 +11,5 @@ Rails.application.routes.draw do
   end
 
   get "update",       to: "update#update"
-  get "file/*path",   to: "files#show", format: false
+  get "file(/*path)",   to: "files#show", format: false
 end

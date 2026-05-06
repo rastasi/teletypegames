@@ -12,7 +12,8 @@
       "Bash(npx vue-tsc *)",
       "Bash(npx vite *)",
       "Bash(xargs ls -la)",
-      "Bash(xargs ls)"
+      "Bash(xargs ls)",
+      "WebFetch(domain:teletypegames.org)"
     ]
   }
 }
