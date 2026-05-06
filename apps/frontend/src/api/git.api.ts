@@ -1,6 +1,6 @@
 import type { GiteaRepo, Commit } from '../lib/interfaces/git.interface'
 
-const BASE = import.meta.env.VITE_GIT_BASE || 'https://git.teletype.hu/api/v1'
+const BASE = import.meta.env.VITE_GIT_BASE || 'https://git.teletypegames.org/api/v1'
 const TOKEN = import.meta.env.WEBAPP_GITEA_TOKEN
 
 function buildHeaders() {

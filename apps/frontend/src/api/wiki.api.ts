@@ -1,6 +1,6 @@
 import type { WikiPage, WikiPageWithContent, WikiPageContent } from '../lib/interfaces/wiki.interface'
 
-const BASE = import.meta.env.VITE_WIKI_BASE || 'https://wiki.teletype.hu'
+const BASE = import.meta.env.VITE_WIKI_BASE || 'https://wiki.teletypegames.org'
 const TOKEN = import.meta.env.WEBAPP_WIKIJS_TOKEN
 
 function buildHeaders(): Record<string, string> {

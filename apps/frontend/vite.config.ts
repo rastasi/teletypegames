@@ -9,20 +9,20 @@ export default defineConfig({
     allowedHosts: ['teletypegames.org'],
     proxy: {
       '/proxy/wiki': {
-        target: 'https://wiki.teletype.hu',
+        target: 'https://wiki.teletypegames.org',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/proxy\/wiki/, '')
       },
       '/_assets': {
-        target: 'https://wiki.teletype.hu',
+        target: 'https://wiki.teletypegames.org',
         changeOrigin: true,
       },
       '/_error': {
-        target: 'https://wiki.teletype.hu',
+        target: 'https://wiki.teletypegames.org',
         changeOrigin: true,
       },
       '/proxy/git': {
-        target: 'https://git.teletype.hu',
+        target: 'https://git.teletypegames.org',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/proxy\/git/, '')
       }
