@@ -7,6 +7,7 @@ class FilesController < ApplicationController
     full_path = BASE_PATH.join(requested)
 
     if File.directory?(full_path)
+      return redirect_to(request.path + "/", status: :moved_permanently) unless request.path.end_with?("/")
       full_path = full_path.join('index.html')
     end
 
